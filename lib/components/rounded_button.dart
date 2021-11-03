@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:miwabora/constants.dart';
 
 class RoundedButton extends StatelessWidget {
   final String? text;
@@ -17,11 +18,11 @@ class RoundedButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(15),
         child: FlatButton(
           padding: EdgeInsets.symmetric(vertical: 20, horizontal: 40),
-          color: color,
+          color: kPrimaryColor,
           onPressed: press,
           child: Text(
             text.toString(),
-            style: TextStyle(color: textColor),
+            style: TextStyle(color: textWhiteColor),
           ),
         ),
       ),
