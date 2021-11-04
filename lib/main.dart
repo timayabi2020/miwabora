@@ -44,21 +44,26 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        backgroundColor: Colors.white,
-        body: Stack(children: [
-          Center(
-            child: Image.asset("assets/images/splashimage.png"),
-          ),
-          Positioned.fill(
-              child: isLoading
-                  ? Align(
-                      alignment: Alignment.center,
-                      child: CircularProgressIndicator(
-                        valueColor:
-                            AlwaysStoppedAnimation<Color>(Colors.white70),
-                      ))
-                  : Text(''))
-        ]));
+    return Stack(children: [
+      Container(
+          decoration: BoxDecoration(
+              image: DecorationImage(
+                  image: AssetImage("assets/images/splashimage.png"),
+                  fit: BoxFit.cover))),
+      Scaffold(
+          resizeToAvoidBottomInset: false,
+          backgroundColor: Colors.transparent,
+          body: Stack(children: [
+            Positioned.fill(
+                child: isLoading
+                    ? Align(
+                        alignment: Alignment.center,
+                        child: CircularProgressIndicator(
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.white70),
+                        ))
+                    : Text(''))
+          ]))
+    ]);
   }
 }

@@ -1,0 +1,10 @@
+const String ROOT = "https://miwabora.kikosi.co.ke";
+const String COUNTIES = "$ROOT/api/v1/county";
+const String ZONES = "$ROOT/api/v1/ecological-zone";
+const String MILLERS = "$ROOT/api/v1/millers";
+const String SUB_COUNTIES = "$ROOT/api/v1/sub-county";
+const String REGISTER = "$ROOT/api/v1/register";
+const String TRADER_REGISTER = "$ROOT/api/v1/TraderRegister";
+const String INVESTOR_REGISTER = "$ROOT/api/v1/InvestorRegister";
+const String OTHER_REGISTER = "$ROOT/api/v1/other";
+const String COUNTRIES = "https://restcountries.com/v2/all";

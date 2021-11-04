@@ -3,10 +3,9 @@ import 'package:miwabora/constants.dart';
 
 class ResetPassword extends StatelessWidget {
   final Function()? press;
-  const ResetPassword({
-    Key? key,
-    this.press,
-  }) : super(key: key);
+  final String text;
+  const ResetPassword({Key? key, this.press, required this.text})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +16,7 @@ class ResetPassword extends StatelessWidget {
           onTap: press,
           // onTap: press,
           child: Text(
-            "Forgot password?",
+            text.toString(),
             style: TextStyle(
               shadows: [Shadow(color: kPrimaryColor, offset: Offset(0, -5))],
               color: Colors.transparent,
