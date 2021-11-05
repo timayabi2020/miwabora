@@ -12,16 +12,21 @@ import 'package:miwabora/components/forgot_password.dart';
 import 'package:miwabora/components/rounded_button.dart';
 import 'package:miwabora/constants.dart';
 
-class FarmerRegistrationPage extends StatefulWidget {
-  const FarmerRegistrationPage({Key? key}) : super(key: key);
+class UpdateFarmerRegistrationPage extends StatefulWidget {
+  Map<String, String>? resultsMap;
+  UpdateFarmerRegistrationPage(Map<String, String> details) {
+    this.resultsMap = details;
+  }
 
   @override
-  _FarmerRegistrationPageState createState() => _FarmerRegistrationPageState();
+  _UpdateFarmerRegistrationPageState createState() =>
+      _UpdateFarmerRegistrationPageState(resultsMap);
 }
 
-class _FarmerRegistrationPageState extends State<FarmerRegistrationPage> {
+class _UpdateFarmerRegistrationPageState
+    extends State<UpdateFarmerRegistrationPage> {
   String? _selectedMiller;
-  String? _selectedCounty;
+  String _selectedCounty = "";
   String? _selectedSubCounty;
   String? _selectedZone;
   bool loading = true;
@@ -38,13 +43,22 @@ class _FarmerRegistrationPageState extends State<FarmerRegistrationPage> {
   String? _size;
   String? _phone;
   String? _name;
+  String? _userId;
   bool _passwordVisible = true;
   bool _confirmpasswordVisible = true;
+  Map<String, String>? details;
+
+  _UpdateFarmerRegistrationPageState(Map<String, String>? resultsMap) {
+    this.details = resultsMap;
+  }
 
   @override
   void initState() {
     _passwordVisible = !_passwordVisible;
     _confirmpasswordVisible = !_confirmpasswordVisible;
+    //clearance first
+    counties.clear();
+    filtererd_subcounties.clear();
     fetchCounties().then((data) {
       setState(() {
         counties = data;
@@ -69,8 +83,38 @@ class _FarmerRegistrationPageState extends State<FarmerRegistrationPage> {
       });
     });
 
-    //preload sub counties with first value
-    //this.selectedCounty("1");
+    _extractDetails();
+  }
+
+  void _extractDetails() {
+    String? username = this.details!["username"];
+    String? userId = this.details!["userid"];
+    String? phone = this.details!["phone"];
+    String? email = this.details!["email"];
+    String? type = this.details!["farmer_types"];
+    String? miller = this.details!["miller_id"];
+    String? county = this.details!["county"];
+    String? subcounty = this.details!["sub_county"];
+    String? farmsize = this.details!["size_of_farm"];
+    String? zone = this.details!["zone_id"];
+
+    setState(() {
+      _name = username;
+      _email = email;
+      _phone = phone;
+      _userId = userId;
+      _type = type;
+      _selectedMiller = miller;
+      _selectedCounty = county.toString();
+      //_selectedSubCounty = subcounty;
+      _size = farmsize;
+      _selectedZone = zone;
+    });
+
+    this.selectedCounty(county.toString());
+    setState(() {
+      // _selectedSubCounty = subcounty;
+    });
   }
 
   void _emailChange(String text) {
@@ -198,7 +242,7 @@ class _FarmerRegistrationPageState extends State<FarmerRegistrationPage> {
           resizeToAvoidBottomInset: false,
           backgroundColor: Colors.transparent,
           appBar: AppBar(
-            title: Text("Farmer Register"),
+            title: Text("Profile"),
             backgroundColor: kPrimaryColor,
           ),
           body: SingleChildScrollView(
@@ -219,6 +263,7 @@ class _FarmerRegistrationPageState extends State<FarmerRegistrationPage> {
                             autofocus: true,
                             cursorColor: kPrimaryColor,
                             minLines: 1,
+                            initialValue: this._name,
                             keyboardType: TextInputType.text,
                             style: TextStyle(color: Colors.black),
                             decoration: InputDecoration(
@@ -247,6 +292,7 @@ class _FarmerRegistrationPageState extends State<FarmerRegistrationPage> {
                             autofocus: true,
                             cursorColor: kPrimaryColor,
                             minLines: 1,
+                            initialValue: this._phone,
                             keyboardType: TextInputType.number,
                             style: TextStyle(color: Colors.black),
                             decoration: InputDecoration(
@@ -275,6 +321,7 @@ class _FarmerRegistrationPageState extends State<FarmerRegistrationPage> {
                             autofocus: true,
                             cursorColor: kPrimaryColor,
                             minLines: 1,
+                            initialValue: this._email,
                             keyboardType: TextInputType.emailAddress,
                             style: TextStyle(color: Colors.black),
                             decoration: InputDecoration(
@@ -391,6 +438,7 @@ class _FarmerRegistrationPageState extends State<FarmerRegistrationPage> {
                             autofocus: true,
                             cursorColor: kPrimaryColor,
                             minLines: 1,
+                            initialValue: this._size,
                             keyboardType: TextInputType.emailAddress,
                             style: TextStyle(color: Colors.black),
                             decoration: InputDecoration(
@@ -516,7 +564,7 @@ class _FarmerRegistrationPageState extends State<FarmerRegistrationPage> {
                                 padding: EdgeInsets.only(
                                     left: size.width * 0.10,
                                     right: size.width * 0.10),
-                                child: DropdownButton(
+                                child: DropdownButtonFormField(
                                   isExpanded: true,
                                   iconSize: 30.0,
                                   style: TextStyle(color: Colors.black),
@@ -529,11 +577,6 @@ class _FarmerRegistrationPageState extends State<FarmerRegistrationPage> {
                                     },
                                   ).toList(),
                                   onChanged: (val) {
-                                    setState(
-                                      () {
-                                        _selectedCounty = val.toString();
-                                      },
-                                    );
                                     this.selectedCounty(val.toString());
                                   },
                                   value: _selectedCounty,
@@ -680,18 +723,25 @@ class _FarmerRegistrationPageState extends State<FarmerRegistrationPage> {
     ]);
   }
 
-  void selectedCounty(String val) {
+  selectedCounty(String val) {
     //filter subcounty depending on counties
     //CLear the nini first
-    setState(() {
+    /* setState(() {
       filtererd_subcounties.clear();
-    });
+    });*/
+    print(sub_counties);
+    filtererd_subcounties.clear();
+    setState(
+      () {
+        _selectedCounty = val.toString();
+      },
+    );
     setState(() {
       filtererd_subcounties = sub_counties
-          .where(
-              (county) => county["county_id"].toString().toLowerCase() == val)
+          .where((county) => county["county_id"].toString() == val)
           .toList();
     });
+    print(filtererd_subcounties);
   }
 
   registerDialog(BuildContext context) {
@@ -759,7 +809,7 @@ class _FarmerRegistrationPageState extends State<FarmerRegistrationPage> {
               this._size = null;
               this._type = null;
               this._selectedMiller = null;
-              this._selectedCounty = null;
+              this._selectedCounty = "";
               this._selectedSubCounty = null;
               this._selectedZone = null;
             });
@@ -862,8 +912,10 @@ class _FarmerRegistrationPageState extends State<FarmerRegistrationPage> {
     final http = new IOClient(ioc);
     try {
       return await http.post(
-        Uri.parse(REGISTER +
-            "?name=" +
+        Uri.parse(UPDATE_PROFILE +
+            "?user_id=" +
+            _userId.toString() +
+            "&name=" +
             _name +
             "&ward=" +
             _phone +
