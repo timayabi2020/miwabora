@@ -44,6 +44,8 @@ class _UpdateFarmerRegistrationPageState
   String? _phone;
   String? _name;
   String? _userId;
+  String? holding;
+  bool showSubDropDown = false;
   bool _passwordVisible = true;
   bool _confirmpasswordVisible = true;
   Map<String, String>? details;
@@ -71,22 +73,22 @@ class _UpdateFarmerRegistrationPageState
       });
     });
 
-    fetchSubCounties().then((data) {
-      setState(() {
-        sub_counties = data;
-      });
-    });
-
     fetchZones().then((data) {
       setState(() {
         zones = data;
+      });
+    });
+    fetchSubCounties().then((data) {
+      setState(() {
+        sub_counties = data;
+        filtererd_subcounties = data;
       });
     });
 
     _extractDetails();
   }
 
-  void _extractDetails() {
+  _extractDetails() async {
     String? username = this.details!["username"];
     String? userId = this.details!["userid"];
     String? phone = this.details!["phone"];
@@ -106,15 +108,11 @@ class _UpdateFarmerRegistrationPageState
       _type = type;
       _selectedMiller = miller;
       _selectedCounty = county.toString();
-      //_selectedSubCounty = subcounty;
+      _selectedSubCounty = subcounty;
       _size = farmsize;
       _selectedZone = zone;
     });
-
-    this.selectedCounty(county.toString());
-    setState(() {
-      // _selectedSubCounty = subcounty;
-    });
+    //this.selectedCounty(county!);
   }
 
   void _emailChange(String text) {
@@ -170,13 +168,13 @@ class _UpdateFarmerRegistrationPageState
       //var obj = json.decode(res.body);
       Map<String, dynamic> map = json.decode(res.body);
       List<dynamic> data = map["data"];
-      loading = false;
+      //loading = false;
       return data;
     }
   }
 
   Future fetchZones() async {
-    loading = true;
+    //loading = true;
     final ioc = new HttpClient();
     ioc.badCertificateCallback =
         (X509Certificate cert, String host, int port) => true;
@@ -194,7 +192,7 @@ class _UpdateFarmerRegistrationPageState
   }
 
   Future fetchSubCounties() async {
-    loading = true;
+    // loading = true;
     final ioc = new HttpClient();
     ioc.badCertificateCallback =
         (X509Certificate cert, String host, int port) => true;
@@ -207,12 +205,13 @@ class _UpdateFarmerRegistrationPageState
       Map<String, dynamic> map = json.decode(res.body);
       List<dynamic> data = map["data"];
       loading = false;
+      //this.preloadedSubCountyInfo(subcounty!);
       return data;
     }
   }
 
   Future fetchMillers() async {
-    loading = true;
+    //loading = true;
     final ioc = new HttpClient();
     ioc.badCertificateCallback =
         (X509Certificate cert, String host, int port) => true;
@@ -224,7 +223,7 @@ class _UpdateFarmerRegistrationPageState
     if (res.statusCode == 200) {
       Map<String, dynamic> map = json.decode(res.body);
       List<dynamic> data = map["data"];
-      loading = false;
+      // loading = false;
       return data;
     }
   }
@@ -250,7 +249,7 @@ class _UpdateFarmerRegistrationPageState
                   //mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                 Text(
-                  'Create your account',
+                  'Update Profile',
                   style: TextStyle(fontSize: 20),
                 ),
                 Row(children: [
@@ -693,25 +692,33 @@ class _UpdateFarmerRegistrationPageState
                                 child: Text("No zone data found"))),
                       ]),
                 SizedBox(height: size.height * 0.03),
-                Align(
-                    alignment: Alignment.center,
-                    child: RoundedButton(
-                      text: "REGISTER",
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                        alignment: Alignment.center,
+                        child: RoundedButton(
+                          text: "CANCEL",
+                          sizeval: 0.40,
+                          color: Colors.grey,
+                          press: () {
+                            // registerDialog(context);
+                            //confirmInternet(context);
+                          },
+                        )),
+                    SizedBox(width: size.height * 0.03),
+                    Container(
+                        child: RoundedButton(
+                      text: "UPDATE",
+                      sizeval: 0.40,
+                      color: kPrimaryColor,
                       press: () {
                         registerDialog(context);
                         //confirmInternet(context);
                       },
-                    )),
-                SizedBox(height: size.height * 0.03),
-                Container(
-                    padding: EdgeInsets.only(
-                        left: size.width * 0.10, right: size.width * 0.10),
-                    child: ResetPassword(
-                      press: () {
-                        navigateToLogin(context);
-                      },
-                      text: 'Already a User? Go to Login',
-                    )),
+                    ))
+                  ],
+                ),
                 SizedBox(height: size.height * 0.03),
               ]))),
       Center(
@@ -725,23 +732,16 @@ class _UpdateFarmerRegistrationPageState
 
   selectedCounty(String val) {
     //filter subcounty depending on counties
-    //CLear the nini first
-    /* setState(() {
-      filtererd_subcounties.clear();
-    });*/
-    print(sub_counties);
-    filtererd_subcounties.clear();
     setState(
       () {
         _selectedCounty = val.toString();
+        _selectedSubCounty = null;
       },
     );
-    setState(() {
-      filtererd_subcounties = sub_counties
-          .where((county) => county["county_id"].toString() == val)
-          .toList();
-    });
-    print(filtererd_subcounties);
+
+    filtererd_subcounties = sub_counties
+        .where((county) => county["county_id"].toString() == val)
+        .toList();
   }
 
   registerDialog(BuildContext context) {
@@ -751,6 +751,8 @@ class _UpdateFarmerRegistrationPageState
       apiErrorShowDialog(context, "Please enter phone number");
     } else if (_type == null || this._type == "") {
       apiErrorShowDialog(context, "Please select type");
+    } else if (_password == null || this._password == "") {
+      apiErrorShowDialog(context, "Please enter password");
     } else if (_size == null || this._size == "") {
       apiErrorShowDialog(context, "Please enter farm size");
     } else if (_selectedMiller == null || this._selectedMiller == "") {
@@ -793,14 +795,15 @@ class _UpdateFarmerRegistrationPageState
           Navigator.of(context, rootNavigator: true).pop();
           Registration result =
               Registration.fromJson(jsonDecode(response.body));
-          if (result.success == false) {
-            print("Got an error " + result.error.toString());
-            apiErrorShowDialog(context, result.error.toString());
+          if (result.statuscode != 200) {
+            // print("Got an error " + result.toString());
+            apiErrorShowDialog(context,
+                "Service encountered an error. Please try again later");
           } else {
-            apiSuccessShowDialog(context, result.error.toString());
+            apiSuccessShowDialog(context, result.success.toString());
             //set everything to null
 
-            setState(() {
+            /* setState(() {
               this._name = null;
               this._phone = null;
               this._email = null;
@@ -812,14 +815,14 @@ class _UpdateFarmerRegistrationPageState
               this._selectedCounty = "";
               this._selectedSubCounty = null;
               this._selectedZone = null;
-            });
+            });*/
           }
         } else {
           // If the server did not return a 201 CREATED response,
           // then throw an exception.
           String message =
-              Registration.fromJson(jsonDecode(response.body)).error.toString();
-          print("Message " + message);
+              "Service encountered an error. Please try again later";
+
           Navigator.of(context, rootNavigator: true).pop();
           apiErrorShowDialog(context, message);
           //throw Exception('Failed to create album.');
@@ -873,7 +876,7 @@ class _UpdateFarmerRegistrationPageState
         dialogType: DialogType.NO_HEADER,
         showCloseIcon: true,
         title: 'Succes',
-        desc: "Registration was successful",
+        desc: message,
         btnOkOnPress: () {
           //Go back to login page
           navigateToLogin(context);
@@ -883,13 +886,9 @@ class _UpdateFarmerRegistrationPageState
   }
 
   void navigateToLogin(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) {
-          return LoginPage();
-        },
-      ),
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (BuildContext context) => LoginPage()),
+      (route) => false,
     );
   }
 
@@ -910,31 +909,33 @@ class _UpdateFarmerRegistrationPageState
     ioc.badCertificateCallback =
         (X509Certificate cert, String host, int port) => true;
     final http = new IOClient(ioc);
+    String payload = UPDATE_PROFILE +
+        "?id=" +
+        _userId.toString() +
+        "&name=" +
+        _name +
+        "&ward=" +
+        _phone +
+        "&email=" +
+        _email +
+        "&county=" +
+        _selectedCounty +
+        "&zone_id=" +
+        _selectedZone +
+        "&password=" +
+        _password +
+        "&miller_id=" +
+        _selectedMiller +
+        "&sub_county=" +
+        _selectedSubCounty +
+        "&size_of_farm=" +
+        _size +
+        "&farmer_types=" +
+        _type;
+    print(payload);
     try {
       return await http.post(
-        Uri.parse(UPDATE_PROFILE +
-            "?user_id=" +
-            _userId.toString() +
-            "&name=" +
-            _name +
-            "&ward=" +
-            _phone +
-            "&email=" +
-            _email +
-            "&county=" +
-            _selectedCounty +
-            "&zone_id=" +
-            _selectedZone +
-            "&password=" +
-            _password +
-            "&miller_id=" +
-            _selectedMiller +
-            "&sub_county=" +
-            _selectedSubCounty +
-            "&size_of_farm=" +
-            _size +
-            "&farmer_types=" +
-            _type),
+        Uri.parse(payload),
         headers: <String, String>{
           'Content-Type': 'text/plain',
         },
@@ -973,13 +974,21 @@ class _UpdateFarmerRegistrationPageState
 
     return true;
   }
+
+  void preloadedSubCountyInfo(String s) {
+    print(this.filtererd_subcounties);
+  }
 }
 
 class Registration {
-  final bool? success;
-  final String? error;
-  Registration({this.success, this.error});
+  final String? success;
+  final String? result;
+  final int? statuscode;
+  Registration({this.success, this.result, this.statuscode});
   factory Registration.fromJson(Map<String, dynamic> json) {
-    return Registration(success: json['success'], error: json['error']);
+    return Registration(
+        success: json['success'],
+        result: json['result'],
+        statuscode: json['statuscode']);
   }
 }

@@ -88,6 +88,8 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
                 SizedBox(height: size.height * 0.05),
                 RoundedButton(
                   text: "RESET PASSWORD",
+                  color: kPrimaryColor,
+                  sizeval: 0.7,
                   press: () {
                     //  buildShowDialog(context);
                     resetDialog(context);

@@ -129,6 +129,8 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
                 SizedBox(height: size.height * 0.05),
                 RoundedButton(
                   text: "SUBMIT",
+                  sizeval: 0.7,
+                  color: kPrimaryColor,
                   press: () {
                     //  buildShowDialog(context);
                     raiseComplaint(context);
@@ -260,13 +262,10 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
   }
 
   void navigateToDashboard(BuildContext context) {
-    Navigator.push(
-      context,
+    Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(
-        builder: (context) {
-          return Dashboard(this.details!);
-        },
-      ),
+          builder: (BuildContext context) => Dashboard(this.details!)),
+      (route) => false,
     );
   }
 }

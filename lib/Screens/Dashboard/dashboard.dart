@@ -542,13 +542,9 @@ class _DashboardState extends State<Dashboard> {
   }
 
   void navigateToLogin(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) {
-          return LoginPage();
-        },
-      ),
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (BuildContext context) => LoginPage()),
+      (route) => false,
     );
   }
 
@@ -560,6 +556,11 @@ class _DashboardState extends State<Dashboard> {
           return ProfileBrief(details!);
         },
       ),
+    );
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(
+          builder: (BuildContext context) => ProfileBrief(details!)),
+      (route) => false,
     );
   }
 

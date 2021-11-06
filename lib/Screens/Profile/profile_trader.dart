@@ -12,18 +12,21 @@ import 'package:miwabora/components/forgot_password.dart';
 import 'package:miwabora/components/rounded_button.dart';
 import 'package:miwabora/constants.dart';
 
-class OtherRegistrationPage extends StatefulWidget {
-  const OtherRegistrationPage({Key? key}) : super(key: key);
+class UpdateTraderrRegistrationPage extends StatefulWidget {
+  Map<String, String>? resultsMap;
+  UpdateTraderrRegistrationPage(Map<String, String> details) {
+    this.resultsMap = details;
+  }
 
   @override
-  _OtherRegistrationPageState createState() => _OtherRegistrationPageState();
+  _UpdateTraderRegistrationPageState createState() =>
+      _UpdateTraderRegistrationPageState(resultsMap);
 }
 
-class _OtherRegistrationPageState extends State<OtherRegistrationPage> {
-  String? _selectedMiller;
-  String _selectedCounty = "30";
-  String? _selectedSubCounty;
-  String? _selectedZone;
+class _UpdateTraderRegistrationPageState
+    extends State<UpdateTraderrRegistrationPage> {
+  String? _traderProducts;
+  String? _userId;
   bool loading = true;
   String? _type;
   List counties = [];
@@ -41,41 +44,18 @@ class _OtherRegistrationPageState extends State<OtherRegistrationPage> {
   bool _passwordVisible = true;
   bool _confirmpasswordVisible = true;
   List selectedProducts = [];
+  Map<String, String>? details;
+
+  _UpdateTraderRegistrationPageState(Map<String, String>? resultsMap) {
+    this.details = resultsMap;
+  }
 
   @override
   void initState() {
     _passwordVisible = !_passwordVisible;
     _confirmpasswordVisible = !_confirmpasswordVisible;
 
-    //preload sub counties with first value
-    //this.selectedCounty("1");
-
-    _passwordVisible = !_passwordVisible;
-    _confirmpasswordVisible = !_confirmpasswordVisible;
-    fetchCounties().then((data) {
-      setState(() {
-        counties = data;
-      });
-    });
-  }
-
-  Future fetchCounties() async {
-    loading = true;
-    final ioc = new HttpClient();
-    ioc.badCertificateCallback =
-        (X509Certificate cert, String host, int port) => true;
-    final http = new IOClient(ioc);
-    var res = await http.get(Uri.parse(COUNTIES), headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-      //'Authorization': 'AppBearer ' + token,
-    });
-    if (res.statusCode == 200) {
-      //var obj = json.decode(res.body);
-      Map<String, dynamic> map = json.decode(res.body);
-      List<dynamic> data = map["data"];
-      loading = false;
-      return data;
-    }
+    _extractDetails();
   }
 
   void _emailChange(String text) {
@@ -92,7 +72,7 @@ class _OtherRegistrationPageState extends State<OtherRegistrationPage> {
 
   void _newPasswordChange(String text) {
     setState(() {
-      _newPassword = text;
+      _password = text;
     });
   }
 
@@ -117,15 +97,39 @@ class _OtherRegistrationPageState extends State<OtherRegistrationPage> {
 
   List products = [
     {
-      'name': 'Milling',
+      'name': 'Sugar',
     },
-    {'name': 'Farming'},
-    {'name': 'Sugar & Sugar Products'},
-    {'name': 'Other'},
+    {'name': 'Molasses'},
+    {'name': 'Jaggery'},
+    {'name': 'Ethanol'},
+    {'name': 'Other'}
   ];
 
   bool isSearching = false;
   var holder_1 = [];
+
+  _extractDetails() async {
+    String? username = this.details!["username"];
+    String? userId = this.details!["userid"];
+    String? phone = this.details!["phone"];
+    String? email = this.details!["email"];
+    String? type = this.details!["trader_type"];
+    String? products = this.details!["trader_products"];
+    String? trader_town = this.details!["town"];
+
+    List<String> preloaded = products!.split(',');
+
+    setState(() {
+      _name = username;
+      _email = email;
+      _phone = phone;
+      _userId = userId;
+      _type = type;
+      selectedProducts = preloaded;
+      _town = trader_town;
+    });
+    //this.selectedCounty(county!);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -140,7 +144,7 @@ class _OtherRegistrationPageState extends State<OtherRegistrationPage> {
           resizeToAvoidBottomInset: false,
           backgroundColor: Colors.transparent,
           appBar: AppBar(
-            title: Text("Other Register"),
+            title: Text("Profile"),
             backgroundColor: kPrimaryColor,
           ),
           body: SingleChildScrollView(
@@ -148,7 +152,7 @@ class _OtherRegistrationPageState extends State<OtherRegistrationPage> {
                   //mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                 Text(
-                  'Create your account',
+                  'Update profile',
                   style: TextStyle(fontSize: 20),
                 ),
                 Row(children: [
@@ -161,6 +165,7 @@ class _OtherRegistrationPageState extends State<OtherRegistrationPage> {
                             autofocus: true,
                             cursorColor: kPrimaryColor,
                             minLines: 1,
+                            initialValue: _name,
                             keyboardType: TextInputType.text,
                             style: TextStyle(color: Colors.black),
                             decoration: InputDecoration(
@@ -172,7 +177,7 @@ class _OtherRegistrationPageState extends State<OtherRegistrationPage> {
                                     fontWeight: FontWeight.bold,
                                     fontSize: 15,
                                     color: kPrimaryColor),
-                                labelText: 'Name*',
+                                labelText: 'Business Name*',
                                 hintText: 'e.g John Doe'),
                             onChanged: (value) {
                               _nameChange(value);
@@ -187,6 +192,7 @@ class _OtherRegistrationPageState extends State<OtherRegistrationPage> {
                               right: size.width * 0.10),
                           child: TextFormField(
                             autofocus: true,
+                            initialValue: _phone,
                             cursorColor: kPrimaryColor,
                             minLines: 1,
                             keyboardType: TextInputType.number,
@@ -217,6 +223,7 @@ class _OtherRegistrationPageState extends State<OtherRegistrationPage> {
                             autofocus: true,
                             cursorColor: kPrimaryColor,
                             minLines: 1,
+                            initialValue: _email,
                             keyboardType: TextInputType.emailAddress,
                             style: TextStyle(color: Colors.black),
                             decoration: InputDecoration(
@@ -235,56 +242,6 @@ class _OtherRegistrationPageState extends State<OtherRegistrationPage> {
                             },
                           )))
                 ]),
-
-                Row(children: [
-                  Expanded(
-                      child: Container(
-                    padding: EdgeInsets.only(
-                        left: size.width * 0.10, right: size.width * 0.10),
-                    child: Text("Select county *"),
-                  )),
-                ]),
-                counties.length != 0
-                    ? Row(
-                        children: [
-                          Expanded(
-                            child: Container(
-                                padding: EdgeInsets.only(
-                                    left: size.width * 0.10,
-                                    right: size.width * 0.10),
-                                child: DropdownButton(
-                                  isExpanded: true,
-                                  iconSize: 30.0,
-                                  style: TextStyle(color: Colors.black),
-                                  items: counties.map(
-                                    (val) {
-                                      return DropdownMenuItem<String>(
-                                        value: val['id'].toString(),
-                                        child: Text(val['name']),
-                                      );
-                                    },
-                                  ).toList(),
-                                  onChanged: (val) {
-                                    setState(
-                                      () {
-                                        _selectedCounty = val.toString();
-                                      },
-                                    );
-                                    //this.selectedCounty(val.toString());
-                                  },
-                                  value: _selectedCounty,
-                                )),
-                          )
-                        ],
-                      )
-                    : Row(children: [
-                        Expanded(
-                            child: Container(
-                                padding: EdgeInsets.only(
-                                    left: size.width * 0.10,
-                                    right: size.width * 0.10),
-                                child: Text("No county data found"))),
-                      ]),
                 Row(children: [
                   Expanded(
                       child: Container(
@@ -373,52 +330,189 @@ class _OtherRegistrationPageState extends State<OtherRegistrationPage> {
                     ),
                   ))
                 ]),
-
-                //SizedBox(height: size.height * 0.03),
+                Row(children: [
+                  Expanded(
+                      child: Container(
+                          padding: EdgeInsets.only(
+                              left: size.width * 0.10,
+                              right: size.width * 0.10),
+                          child: TextFormField(
+                            autofocus: true,
+                            cursorColor: kPrimaryColor,
+                            minLines: 1,
+                            initialValue: _town,
+                            keyboardType: TextInputType.emailAddress,
+                            style: TextStyle(color: Colors.black),
+                            decoration: InputDecoration(
+                                enabledBorder: UnderlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: kPrimaryColor)),
+                                hintStyle: TextStyle(color: Colors.black),
+                                labelStyle: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                    color: kPrimaryColor),
+                                labelText: 'Town*',
+                                hintText: 'e.g Kitengela, Machakos ...'),
+                            onChanged: (value) {
+                              _townChange(value);
+                            },
+                          )))
+                ]),
                 SizedBox(height: size.height * 0.03),
-                Align(
-                    alignment: Alignment.center,
-                    child: RoundedButton(
-                      text: "REGISTER",
-                      sizeval: 0.7,
+                Row(children: [
+                  Expanded(
+                      child: Container(
+                    padding: EdgeInsets.only(
+                        left: size.width * 0.10, right: size.width * 0.10),
+                    child: Text("Type *"),
+                  )),
+                ]),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                          padding: EdgeInsets.only(
+                              left: size.width * 0.10,
+                              right: size.width * 0.10),
+                          child: DropdownButton(
+                            isExpanded: true,
+                            iconSize: 30.0,
+                            style: TextStyle(color: Colors.black),
+                            items: [
+                              'Wholesaler',
+                              'Retailer',
+                              'Importer',
+                              'Other'
+                            ].map(
+                              (val) {
+                                return DropdownMenuItem<String>(
+                                  value: val,
+                                  child: Text(val),
+                                );
+                              },
+                            ).toList(),
+                            onChanged: (val) {
+                              setState(
+                                () {
+                                  _type = val.toString();
+                                },
+                              );
+                            },
+                            value: _type,
+                          )),
+                    )
+                  ],
+                ),
+                SizedBox(height: size.height * 0.03),
+                Row(children: [
+                  Expanded(
+                      child: Container(
+                    padding: EdgeInsets.only(
+                        left: size.width * 0.10, right: size.width * 0.10),
+                    child: Text("Products *"),
+                  )),
+                ]),
+                SizedBox(height: size.height * 0.03),
+                Row(children: [
+                  Expanded(
+                      child: Container(
+                          padding: EdgeInsets.only(
+                              left: size.width * 0.10,
+                              right: size.width * 0.10),
+                          child: Column(
+                            children: <Widget>[
+                              GridView.builder(
+                                  gridDelegate:
+                                      SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    childAspectRatio: MediaQuery.of(context)
+                                            .size
+                                            .width /
+                                        (MediaQuery.of(context).size.height /
+                                            8),
+                                  ),
+                                  physics: NeverScrollableScrollPhysics(),
+                                  shrinkWrap: true,
+                                  itemCount: products.length,
+                                  itemBuilder: (context, index) {
+                                    return Card(
+                                        color: Colors.white,
+                                        // color: Color.fromRGBO(138, 170, 243, 0.5),
+
+                                        elevation: 2,
+                                        child: Container(
+                                            child: Row(children: [
+                                          // Text(products[index]["name"]),
+                                          Checkbox(
+                                            shape: CircleBorder(),
+                                            value: selectedProducts.contains(
+                                                products[index]["name"]),
+                                            onChanged: (value) {
+                                              if (selectedProducts.contains(
+                                                  products[index]["name"])) {
+                                                selectedProducts.remove(
+                                                    products[index]
+                                                        ["name"]); // unselect
+                                              } else {
+                                                selectedProducts.add(
+                                                    products[index]
+                                                        ["name"]); // select
+                                              }
+                                              setState(() {});
+                                            },
+                                            checkColor: Colors.white,
+                                            //inactiveColor: Colors.white,
+                                            activeColor: kPrimaryColor,
+                                          ),
+
+                                          const SizedBox(width: 8),
+                                          Flexible(
+                                            child: Center(
+                                              child: Text(
+                                                "${products[index]['name']}",
+                                                maxLines: 15,
+                                                style: TextStyle(
+                                                    color: Color.fromRGBO(
+                                                        30, 67, 136, 1)),
+                                              ),
+                                            ),
+                                          ),
+                                        ])));
+                                  })
+                            ],
+                          )))
+                ]),
+                SizedBox(height: size.height * 0.03),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                        alignment: Alignment.center,
+                        child: RoundedButton(
+                          text: "CANCEL",
+                          sizeval: 0.40,
+                          color: Colors.grey,
+                          press: () {
+                            // registerDialog(context);
+                            //confirmInternet(context);
+                          },
+                        )),
+                    SizedBox(width: size.height * 0.03),
+                    Container(
+                        child: RoundedButton(
+                      text: "UPDATE",
+                      sizeval: 0.40,
                       color: kPrimaryColor,
                       press: () {
                         registerDialog(context);
                         //confirmInternet(context);
                       },
-                    )),
-                SizedBox(height: size.height * 0.03),
-                Container(
-                    padding: EdgeInsets.only(
-                        left: size.width * 0.10, right: size.width * 0.10),
-                    child: ResetPassword(
-                      press: () {
-                        navigateToLogin(context);
-                      },
-                      text: 'Already a User? Go to Login',
                     ))
+                  ],
+                ),
               ]))),
-      Center(
-          child: Visibility(
-        visible: loading,
-        child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(kPrimaryColor)),
-      ))
     ]);
-  }
-
-  void selectedCounty(String val) {
-    //filter subcounty depending on counties
-    //CLear the nini first
-    setState(() {
-      filtererd_subcounties.clear();
-    });
-    setState(() {
-      filtererd_subcounties = sub_counties
-          .where(
-              (county) => county["county_id"].toString().toLowerCase() == val)
-          .toList();
-    });
   }
 
   registerDialog(BuildContext context) {
@@ -426,13 +520,16 @@ class _OtherRegistrationPageState extends State<OtherRegistrationPage> {
       apiErrorShowDialog(context, "Please enter name");
     } else if (_phone == null || this._phone == "") {
       apiErrorShowDialog(context, "Please enter phone number");
-    } else if (checkPassLength(this._newPassword.toString()) == true) {
+    } else if (this._type == "") {
+      apiErrorShowDialog(context, "Please select type");
+    } else if (_password == null || this._password == "") {
+      apiErrorShowDialog(context, "Please enter password");
+    } else if (selectedProducts.length < 1) {
+      apiErrorShowDialog(context, "Please select a product");
+    } else if (checkPassLength(this._password.toString()) == true) {
       apiErrorShowDialog(
           context, "Please enter password. Minimum of four characters");
-    } else if (this._selectedCounty == "") {
-      apiErrorShowDialog(context, "Please select a county");
-    } else if (this._newPassword.toString() !=
-        this._confirmPassword.toString()) {
+    } else if (this._password.toString() != this._confirmPassword.toString()) {
       apiErrorShowDialog(
           context, "Password mismatch. Kindly confirm your password again");
     } else if (validateEmail(_email.toString()) == false) {
@@ -442,9 +539,9 @@ class _OtherRegistrationPageState extends State<OtherRegistrationPage> {
           _name.toString(),
           _phone.toString(),
           _email.toString(),
-          _newPassword.toString(),
+          _password.toString(),
           _confirmPassword.toString(),
-          _selectedCounty.toString(),
+          _town.toString(),
           _type.toString(),
           selectedProducts,
           context);
@@ -456,30 +553,29 @@ class _OtherRegistrationPageState extends State<OtherRegistrationPage> {
           Navigator.of(context, rootNavigator: true).pop();
           Registration result =
               Registration.fromJson(jsonDecode(response.body));
-          if (result.success == false) {
-            print("Got an error " + result.error.toString());
-            apiErrorShowDialog(context, result.error.toString());
+          if (result.statuscode != 200) {
+            apiErrorShowDialog(context,
+                "Service encountered an error. Please try again later");
           } else {
-            apiSuccessShowDialog(context, result.error.toString());
+            apiSuccessShowDialog(context, result.success.toString());
             //set everything to null
 
-            setState(() {
+            /*setState(() {
               this._name = null;
               this._phone = null;
               this._email = null;
-              this._newPassword = null;
+              this._password = null;
               this._confirmPassword = null;
-              this._selectedCounty = "30";
-              this._type = null;
+              this._town = null;
+              this._type = "Wholesaler";
               this.selectedProducts = [];
-            });
+            });*/
           }
         } else {
           // If the server did not return a 201 CREATED response,
           // then throw an exception.
           String message =
-              Registration.fromJson(jsonDecode(response.body)).error.toString();
-          print("Message " + message);
+              "Service encountered an error. Please try again later";
           Navigator.of(context, rootNavigator: true).pop();
           apiErrorShowDialog(context, message);
           //throw Exception('Failed to create album.');
@@ -532,8 +628,8 @@ class _OtherRegistrationPageState extends State<OtherRegistrationPage> {
         useRootNavigator: true,
         dialogType: DialogType.NO_HEADER,
         showCloseIcon: true,
-        title: 'Succes',
-        desc: "Registration was successful",
+        title: "Success",
+        desc: message,
         btnOkOnPress: () {
           //Go back to login page
           navigateToLogin(context);
@@ -563,23 +659,27 @@ class _OtherRegistrationPageState extends State<OtherRegistrationPage> {
     ioc.badCertificateCallback =
         (X509Certificate cert, String host, int port) => true;
     final http = new IOClient(ioc);
+    String payload = UPDATE_PROFILE +
+        "?id=" +
+        _userId.toString() +
+        "&name=" +
+        _name +
+        "&ward=" +
+        _phone +
+        "&email=" +
+        _email +
+        "&password=" +
+        _password +
+        "&town=" +
+        _town +
+        "&trader_products=" +
+        _traderProducts.toString() +
+        "&trader_type=" +
+        _type;
+    print(payload);
     try {
       return await http.post(
-        Uri.parse(OTHER_REGISTER +
-            "?name=" +
-            _name +
-            "&ward=" +
-            _phone +
-            "&email=" +
-            _email +
-            "&password=" +
-            _password +
-            "&county=" +
-            _selectedCounty.toString() +
-            "&investor_products=" +
-            _traderProducts.toString() +
-            "&trader_type=" +
-            _type),
+        Uri.parse(payload),
         headers: <String, String>{
           'Content-Type': 'text/plain',
         },
@@ -599,40 +699,36 @@ class _OtherRegistrationPageState extends State<OtherRegistrationPage> {
     }
     throw Exception('Failed to create album.');
   }
-}
 
-bool validateEmail(String value) {
-  String pattern =
-      r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
-  RegExp regex = new RegExp(pattern);
-  return (!regex.hasMatch(value)) ? false : true;
-}
-
-bool checkPassLength(String value) {
-  print("Val length " + value.length.toString());
-  // bool result = false;
-  int strLength = value.length;
-  if (strLength > 3) {
-    print("Retutning false ");
-    return false;
+  bool validateEmail(String value) {
+    String pattern =
+        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+    RegExp regex = new RegExp(pattern);
+    return (!regex.hasMatch(value)) ? false : true;
   }
 
-  return true;
-}
+  bool checkPassLength(String value) {
+    print("Val length " + value.length.toString());
+    // bool result = false;
+    int strLength = value.length;
+    if (strLength > 3) {
+      print("Retutning false ");
+      return false;
+    }
 
-int comparePasswords(String value1, String value2) {
-  print("Value 1" + value1);
-  print("Value 2 " + value2);
-  int result = value1.trim().compareTo(value2.trim());
-  print(result);
-  return result;
+    return true;
+  }
 }
 
 class Registration {
-  final bool? success;
-  final String? error;
-  Registration({this.success, this.error});
+  final String? success;
+  final String? result;
+  final int? statuscode;
+  Registration({this.success, this.result, this.statuscode});
   factory Registration.fromJson(Map<String, dynamic> json) {
-    return Registration(success: json['success'], error: json['error']);
+    return Registration(
+        success: json['success'],
+        result: json['result'],
+        statuscode: json['statuscode']);
   }
 }

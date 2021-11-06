@@ -169,6 +169,8 @@ class _LoginPageState extends State<LoginPage> {
                 SizedBox(height: size.height * 0.05),
                 RoundedButton(
                   text: "LOGIN",
+                  sizeval: 0.7,
+                  color: kPrimaryColor,
                   press: () {
                     //  buildShowDialog(context);
                     loginDialog(context);
@@ -177,6 +179,7 @@ class _LoginPageState extends State<LoginPage> {
                 // SizedBox(height: size.height * 0.05),
                 RoundedButton(
                   text: "NEW USER? REGISTER",
+                  sizeval: 0.7,
                   press: () {
                     //  buildShowDialog(context);
                     registrationOptions(context, size);
@@ -205,6 +208,8 @@ class _LoginPageState extends State<LoginPage> {
                       Expanded(
                           child: RoundedButton(
                         text: "FARMER REGISTER",
+                        sizeval: 0.7,
+                        color: kPrimaryColor,
                         press: () {
                           navigateToFarmerRegistration(context);
                           //confirmInternet(context);
@@ -217,6 +222,8 @@ class _LoginPageState extends State<LoginPage> {
                       Expanded(
                           child: RoundedButton(
                         text: "TRADER REGISTER",
+                        sizeval: 0.7,
+                        color: kPrimaryColor,
                         press: () {
                           navigateToTraderrRegistration(context);
                         },
@@ -228,6 +235,8 @@ class _LoginPageState extends State<LoginPage> {
                       Expanded(
                           child: RoundedButton(
                         text: "MILLER REGISTER",
+                        sizeval: 0.7,
+                        color: kPrimaryColor,
                         press: () {
                           navigateToMillerRegistration(context);
                           //confirmInternet(context);
@@ -240,6 +249,8 @@ class _LoginPageState extends State<LoginPage> {
                       Expanded(
                           child: RoundedButton(
                         text: "OTHER REGISTER",
+                        sizeval: 0.7,
+                        color: kPrimaryColor,
                         press: () {
                           navigateToOtherRegistration(context);
                           //confirmInternet(context);
@@ -493,7 +504,7 @@ class _LoginPageState extends State<LoginPage> {
           "Unable to process your request. Please check your internet connection");
     } on TimeoutException catch (e) {
       //treat TimeoutException
-      Navigator.of(context, rootNavigator: true).pop();
+      // Navigator.of(context, rootNavigator: true).pop();
       apiErrorShowDialog(context, "Connection timed out. Please try again");
     } catch (e) {
       // Navigator.pop(context);
@@ -556,29 +567,59 @@ class Login {
     if (json['statuscode'] != 200) {
       return Login(result: json['result'], statuscode: json['statuscode']);
     }
-    return Login(
-        token: json['token'],
-        result: json['result'],
-        userid: json['userid'],
-        id: json['id'],
-        town: json['town'],
-        role_id: json['role_id'],
-        role: json['role'],
-        zone_id: json['zone_id'],
-        miller_id: json['miller_id'],
-        country: json['country'],
-        county: json['county'],
-        investor_products: json['investor_products'],
-        trader_type: json['trader_type'],
-        size_of_farm: json['size_of_farm'],
-        sub_county: json['sub_county'],
-        ward: json['ward'],
-        farmer_types: json['farmer_types'],
-        trader_products: json['trader_products'],
-        email: json['email'],
-        miller: json['miller'],
-        zone: json['zone'],
-        username: json['username'],
-        statuscode: json['statuscode']);
+    if (json['role'] == "Trader") {
+      return Login(
+          token: json['token'],
+          result: json['result'],
+          userid: json['userid'],
+          id: json['id'],
+          town: json['town'],
+          role_id: json['role_id'],
+          role: json['role'],
+          trader_type: json['trader_type'],
+          ward: json['ward'],
+          trader_products: json['trader_products'],
+          email: json['email'],
+          username: json['username'],
+          statuscode: json['statuscode']);
+    } else if (json['role'] == "Investor") {
+      return Login(
+          token: json['token'],
+          result: json['result'],
+          userid: json['userid'],
+          id: json['id'],
+          role_id: json['role_id'],
+          role: json['role'],
+          country: json['country'],
+          ward: json['ward'],
+          investor_products: json['investor_products'],
+          email: json['email'],
+          username: json['username'],
+          statuscode: json['statuscode']);
+    } else
+      return Login(
+          token: json['token'],
+          result: json['result'],
+          userid: json['userid'],
+          id: json['id'],
+          town: json['town'],
+          role_id: json['role_id'],
+          role: json['role'],
+          zone_id: json['zone_id'],
+          miller_id: json['miller_id'],
+          country: json['country'],
+          county: json['county'],
+          investor_products: json['investor_products'],
+          trader_type: json['trader_type'],
+          size_of_farm: json['size_of_farm'],
+          sub_county: json['sub_county'],
+          ward: json['ward'],
+          farmer_types: json['farmer_types'],
+          trader_products: json['trader_products'],
+          email: json['email'],
+          miller: json['miller'],
+          zone: json['zone'],
+          username: json['username'],
+          statuscode: json['statuscode']);
   }
 }

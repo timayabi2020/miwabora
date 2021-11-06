@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:miwabora/Screens/Login/login.dart';
 import 'package:miwabora/Screens/Profile/profile_farmer.dart';
+import 'package:miwabora/Screens/Profile/profile_miller.dart';
+import 'package:miwabora/Screens/Profile/profile_trader.dart';
 import 'package:miwabora/components/rounded_button.dart';
 import 'package:miwabora/constants.dart';
 
@@ -19,6 +21,7 @@ class _ProfileBriefState extends State<ProfileBrief> {
   String? _phone;
   String? _email;
   String? _userId;
+  String? _role;
   _ProfileBriefState(Map<String, String>? resultsMap) {
     this.details = resultsMap;
   }
@@ -34,12 +37,16 @@ class _ProfileBriefState extends State<ProfileBrief> {
     String? userId = this.details!["userid"];
     String? phone = this.details!["phone"];
     String? email = this.details!["email"];
+    String? role = this.details!["role"];
+
+    print("Role" + role.toString() + "User name " + username.toString());
 
     setState(() {
       _username = username;
       _email = email;
       _phone = phone;
       _userId = userId;
+      _role = role;
     });
   }
 
@@ -192,6 +199,8 @@ class _ProfileBriefState extends State<ProfileBrief> {
                     ]))),
                 RoundedButton(
                   text: "LOG OUT",
+                  color: kPrimaryColor,
+                  sizeval: 0.7,
                   press: () {
                     //  buildShowDialog(context);
                     logoutAlertDialog(context);
@@ -247,25 +256,42 @@ class _ProfileBriefState extends State<ProfileBrief> {
   }
 
   void navigateToLogin(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) {
-          return LoginPage();
-        },
-      ),
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (BuildContext context) => LoginPage()),
+      (route) => false,
     );
   }
 
   void navigateToProfile(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) {
-          return UpdateFarmerRegistrationPage(details!);
-        },
-      ),
-    );
+    print('ROle ' + _role.toString());
+    if (_role.toString() == "Farmer") {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) {
+            return UpdateFarmerRegistrationPage(details!);
+          },
+        ),
+      );
+    } else if (_role.toString() == "Investor") {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) {
+            return UpdateMillerRegistrationPage(details!);
+          },
+        ),
+      );
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) {
+            return UpdateTraderrRegistrationPage(details!);
+          },
+        ),
+      );
+    }
   }
 
   buildDivider() {

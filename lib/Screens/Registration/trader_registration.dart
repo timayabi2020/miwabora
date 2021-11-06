@@ -454,6 +454,8 @@ class _TraderRegistrationPageState extends State<TraderRegistrationPage> {
                     alignment: Alignment.center,
                     child: RoundedButton(
                       text: "REGISTER",
+                      sizeval: 0.7,
+                      color: kPrimaryColor,
                       press: () {
                         registerDialog(context);
                         //confirmInternet(context);
@@ -495,8 +497,6 @@ class _TraderRegistrationPageState extends State<TraderRegistrationPage> {
       apiErrorShowDialog(context, "Please enter phone number");
     } else if (this._type == "") {
       apiErrorShowDialog(context, "Please select type");
-    } else if (_town == null || this._town == "") {
-      apiErrorShowDialog(context, "Please select a miller");
     } else if (selectedProducts.length < 1) {
       apiErrorShowDialog(context, "Please select a product");
     } else if (checkPassLength(this._password.toString()) == true) {
@@ -613,13 +613,9 @@ class _TraderRegistrationPageState extends State<TraderRegistrationPage> {
   }
 
   void navigateToLogin(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) {
-          return LoginPage();
-        },
-      ),
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (BuildContext context) => LoginPage()),
+      (route) => false,
     );
   }
 

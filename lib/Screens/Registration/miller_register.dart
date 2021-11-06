@@ -95,7 +95,7 @@ class _MillerRegistrationPageState extends State<MillerRegistrationPage> {
 
   void _newPasswordChange(String text) {
     setState(() {
-      _newPassword = text;
+      _password = text;
     });
   }
 
@@ -459,6 +459,8 @@ class _MillerRegistrationPageState extends State<MillerRegistrationPage> {
                     alignment: Alignment.center,
                     child: RoundedButton(
                       text: "REGISTER",
+                      color: kPrimaryColor,
+                      sizeval: 0.7,
                       press: () {
                         registerDialog(context);
                         //confirmInternet(context);
@@ -623,13 +625,9 @@ class _MillerRegistrationPageState extends State<MillerRegistrationPage> {
   }
 
   void navigateToLogin(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) {
-          return LoginPage();
-        },
-      ),
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (BuildContext context) => LoginPage()),
+      (route) => false,
     );
   }
 
