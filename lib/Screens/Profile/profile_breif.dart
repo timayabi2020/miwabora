@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:miwabora/Screens/Login/login.dart';
+import 'package:miwabora/Screens/Profile/other_profile.dart';
 import 'package:miwabora/Screens/Profile/profile_farmer.dart';
 import 'package:miwabora/Screens/Profile/profile_miller.dart';
 import 'package:miwabora/Screens/Profile/profile_trader.dart';
@@ -282,12 +283,21 @@ class _ProfileBriefState extends State<ProfileBrief> {
           },
         ),
       );
-    } else {
+    } else if (_role == "Trader") {
       Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) {
             return UpdateTraderrRegistrationPage(details!);
+          },
+        ),
+      );
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) {
+            return UpdateOtherRegistrationPage(details!);
           },
         ),
       );

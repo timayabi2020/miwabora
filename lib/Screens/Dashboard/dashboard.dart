@@ -557,11 +557,6 @@ class _DashboardState extends State<Dashboard> {
         },
       ),
     );
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(
-          builder: (BuildContext context) => ProfileBrief(details!)),
-      (route) => false,
-    );
   }
 
   buildDivider() {

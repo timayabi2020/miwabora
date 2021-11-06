@@ -38,8 +38,8 @@ class _FarmerRegistrationPageState extends State<FarmerRegistrationPage> {
   String? _size;
   String? _phone;
   String? _name;
-  bool _passwordVisible = true;
-  bool _confirmpasswordVisible = true;
+  bool _passwordVisible = false;
+  bool _confirmpasswordVisible = false;
 
   @override
   void initState() {

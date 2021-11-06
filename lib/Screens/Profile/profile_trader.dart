@@ -558,18 +558,6 @@ class _UpdateTraderRegistrationPageState
                 "Service encountered an error. Please try again later");
           } else {
             apiSuccessShowDialog(context, result.success.toString());
-            //set everything to null
-
-            /*setState(() {
-              this._name = null;
-              this._phone = null;
-              this._email = null;
-              this._password = null;
-              this._confirmPassword = null;
-              this._town = null;
-              this._type = "Wholesaler";
-              this.selectedProducts = [];
-            });*/
           }
         } else {
           // If the server did not return a 201 CREATED response,
@@ -655,6 +643,15 @@ class _UpdateTraderRegistrationPageState
       String _type,
       List _traderProducts,
       BuildContext context) async {
+    String actualProducts = "";
+    int counter = 0;
+    _traderProducts.forEach((element) {
+      actualProducts += element;
+      if (counter < _traderProducts.length) {
+        actualProducts += ",";
+      }
+      counter++;
+    });
     final ioc = new HttpClient();
     ioc.badCertificateCallback =
         (X509Certificate cert, String host, int port) => true;
@@ -673,7 +670,7 @@ class _UpdateTraderRegistrationPageState
         "&town=" +
         _town +
         "&trader_products=" +
-        _traderProducts.toString() +
+        actualProducts.toString() +
         "&trader_type=" +
         _type;
     print(payload);

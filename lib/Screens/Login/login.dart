@@ -28,7 +28,7 @@ class _LoginPageState extends State<LoginPage> {
   String _password = '';
   String _confirmPassword = '';
   String _newPassword = '';
-  bool _passwordVisible = true;
+  bool _passwordVisible = false;
 
   @override
   void initState() {
@@ -72,122 +72,131 @@ class _LoginPageState extends State<LoginPage> {
       Scaffold(
           resizeToAvoidBottomInset: false,
           backgroundColor: Colors.transparent,
-          body: SingleChildScrollView(
+          body: Container(
 
               //constraints: BoxConstraints.expand(),
               child: Container(
-            color: Colors.transparent,
-            child: Column(
-              //mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Align(
-                    alignment: Alignment.center,
-                    child: Image.asset(
-                      "assets/images/ic_miwa_logo.png",
-                      width: 250,
-                    )),
-                Text(
-                  'Welcome!',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
-                ),
-                // SizedBox(height: size.height * 0.03),
-                Container(
-                    padding: EdgeInsets.only(
-                        left: size.width * 0.10, right: size.width * 0.10),
-                    child: TextFormField(
-                      autofocus: true,
-                      cursorColor: kPrimaryColor,
-                      minLines: 1,
-                      keyboardType: TextInputType.emailAddress,
-                      style: TextStyle(color: Colors.black),
-                      decoration: InputDecoration(
-                          enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: kPrimaryColor)),
-                          hintStyle: TextStyle(color: Colors.black),
-                          labelStyle: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15,
-                              color: kPrimaryColor),
-                          labelText: 'Username*',
-                          hintText: 'Phone number or email'),
-                      onChanged: (value) {
-                        _emailChange(value);
-                      },
-                    )),
-                // SizedBox(height: size.height * 0.05),
-                Container(
-                  padding: EdgeInsets.only(
-                      left: size.width * 0.10, right: size.width * 0.10),
-                  child: TextFormField(
-                    autofocus: true,
-                    minLines: 1,
-                    cursorColor: kPrimaryColor,
-                    obscureText: _passwordVisible,
-                    style: TextStyle(color: Colors.black),
-                    decoration: InputDecoration(
-                      enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: kPrimaryColor)),
-                      hintStyle: TextStyle(color: Colors.black),
-                      labelStyle: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                          color: kPrimaryColor),
-                      hintText: 'Password here...',
-                      labelText: 'Password*',
-                      fillColor: Colors.white,
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          // Based on passwordVisible state choose the icon
-                          _passwordVisible
-                              ? Icons.visibility_off
-                              : Icons.visibility,
-                          color: kPrimaryColor,
+                  color: Colors.transparent,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      //mainAxisAlignment: MainAxisAlignment.center,
+
+                      children: <Widget>[
+                        Align(
+                            alignment: Alignment.center,
+                            child: Image.asset(
+                              "assets/images/ic_miwa_logo.png",
+                              width: 250,
+                            )),
+                        Text(
+                          'Welcome!',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 30),
                         ),
-                        onPressed: () {
-                          // Update the state i.e. toogle the state of passwordVisible variable
-                          setState(() {
-                            _passwordVisible = !_passwordVisible;
-                          });
-                        },
-                      ),
+                        // SizedBox(height: size.height * 0.03),
+
+                        Container(
+                            padding: EdgeInsets.only(
+                                left: size.width * 0.10,
+                                right: size.width * 0.10),
+                            child: TextFormField(
+                              autofocus: true,
+                              cursorColor: kPrimaryColor,
+                              minLines: 1,
+                              keyboardType: TextInputType.emailAddress,
+                              style: TextStyle(color: Colors.black),
+                              decoration: InputDecoration(
+                                  enabledBorder: UnderlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: kPrimaryColor)),
+                                  hintStyle: TextStyle(color: Colors.black),
+                                  labelStyle: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15,
+                                      color: kPrimaryColor),
+                                  labelText: 'Username*',
+                                  hintText: 'Phone number or email'),
+                              onChanged: (value) {
+                                _emailChange(value);
+                              },
+                            )),
+                        // SizedBox(height: size.height * 0.05),
+                        Container(
+                          padding: EdgeInsets.only(
+                              left: size.width * 0.10,
+                              right: size.width * 0.10),
+                          child: TextFormField(
+                            autofocus: true,
+                            minLines: 1,
+                            cursorColor: kPrimaryColor,
+                            obscureText: _passwordVisible,
+                            style: TextStyle(color: Colors.black),
+                            decoration: InputDecoration(
+                              enabledBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: kPrimaryColor)),
+                              hintStyle: TextStyle(color: Colors.black),
+                              labelStyle: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                  color: kPrimaryColor),
+                              hintText: 'Password here...',
+                              labelText: 'Password*',
+                              fillColor: Colors.white,
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  // Based on passwordVisible state choose the icon
+                                  _passwordVisible
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                  color: kPrimaryColor,
+                                ),
+                                onPressed: () {
+                                  // Update the state i.e. toogle the state of passwordVisible variable
+                                  setState(() {
+                                    _passwordVisible = !_passwordVisible;
+                                  });
+                                },
+                              ),
+                            ),
+                            onChanged: (value) {
+                              _passwordChange(value);
+                            },
+                          ),
+                        ),
+                        SizedBox(height: size.height * 0.05),
+                        Container(
+                            padding: EdgeInsets.only(
+                                left: size.width * 0.10,
+                                right: size.width * 0.10),
+                            child: ResetPassword(
+                              press: () {
+                                navigateToPasswordReset(context);
+                              },
+                              text: 'Forgot password?',
+                            )),
+                        SizedBox(height: size.height * 0.05),
+                        RoundedButton(
+                          text: "LOGIN",
+                          sizeval: 0.7,
+                          color: kPrimaryColor,
+                          press: () {
+                            //  buildShowDialog(context);
+                            loginDialog(context);
+                          },
+                        ),
+                        // SizedBox(height: size.height * 0.05),
+                        RoundedButton(
+                          text: "NEW USER? REGISTER",
+                          sizeval: 0.7,
+                          color: kPrimaryColor,
+                          press: () {
+                            //  buildShowDialog(context);
+                            registrationOptions(context, size);
+                          },
+                        )
+                      ],
                     ),
-                    onChanged: (value) {
-                      _passwordChange(value);
-                    },
-                  ),
-                ),
-                SizedBox(height: size.height * 0.05),
-                Container(
-                    padding: EdgeInsets.only(
-                        left: size.width * 0.10, right: size.width * 0.10),
-                    child: ResetPassword(
-                      press: () {
-                        navigateToPasswordReset(context);
-                      },
-                      text: 'Forgot password?',
-                    )),
-                SizedBox(height: size.height * 0.05),
-                RoundedButton(
-                  text: "LOGIN",
-                  sizeval: 0.7,
-                  color: kPrimaryColor,
-                  press: () {
-                    //  buildShowDialog(context);
-                    loginDialog(context);
-                  },
-                ),
-                // SizedBox(height: size.height * 0.05),
-                RoundedButton(
-                  text: "NEW USER? REGISTER",
-                  sizeval: 0.7,
-                  press: () {
-                    //  buildShowDialog(context);
-                    registrationOptions(context, size);
-                  },
-                )
-              ],
-            ),
-          )
+                  ))
 // This trailing comma makes auto-formatting nicer for build methods.
               ))
     ]);
@@ -596,7 +605,7 @@ class Login {
           email: json['email'],
           username: json['username'],
           statuscode: json['statuscode']);
-    } else
+    } else if (json['role'] == "Farmer") {
       return Login(
           token: json['token'],
           result: json['result'],
@@ -621,5 +630,19 @@ class Login {
           zone: json['zone'],
           username: json['username'],
           statuscode: json['statuscode']);
+    } else {
+      return Login(
+          token: json['token'],
+          result: json['result'],
+          userid: json['userid'],
+          id: json['id'],
+          role_id: json['role_id'],
+          role: json['role'],
+          county: json['county'],
+          ward: json['ward'],
+          email: json['email'],
+          username: json['username'],
+          statuscode: json['statuscode']);
+    }
   }
 }

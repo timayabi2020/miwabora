@@ -685,6 +685,16 @@ class _UpdateMillerRegistrationPageState
       String _type,
       List _traderProducts,
       BuildContext context) async {
+    String actualProducts = "";
+    int counter = 0;
+    _traderProducts.forEach((element) {
+      actualProducts += element;
+      if (counter < _traderProducts.length) {
+        actualProducts += ",";
+      }
+      counter++;
+    });
+    print(actualProducts);
     final ioc = new HttpClient();
     ioc.badCertificateCallback =
         (X509Certificate cert, String host, int port) => true;
@@ -705,7 +715,7 @@ class _UpdateMillerRegistrationPageState
             "&country=" +
             _selectedCounty.toString() +
             "&investor_products=" +
-            _traderProducts.toString() +
+            actualProducts.toString() +
             "&trader_type=" +
             _type),
         headers: <String, String>{

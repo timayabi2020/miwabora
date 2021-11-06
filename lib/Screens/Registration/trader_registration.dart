@@ -38,8 +38,8 @@ class _TraderRegistrationPageState extends State<TraderRegistrationPage> {
   String? _town;
   String? _phone;
   String? _name;
-  bool _passwordVisible = true;
-  bool _confirmpasswordVisible = true;
+  bool _passwordVisible = false;
+  bool _confirmpasswordVisible = false;
   List selectedProducts = [];
 
   @override
@@ -629,6 +629,15 @@ class _TraderRegistrationPageState extends State<TraderRegistrationPage> {
       String _type,
       List _traderProducts,
       BuildContext context) async {
+    String actualProducts = "";
+    int counter = 0;
+    _traderProducts.forEach((element) {
+      actualProducts += element;
+      if (counter < _traderProducts.length) {
+        actualProducts += ",";
+      }
+      counter++;
+    });
     final ioc = new HttpClient();
     ioc.badCertificateCallback =
         (X509Certificate cert, String host, int port) => true;
@@ -647,7 +656,7 @@ class _TraderRegistrationPageState extends State<TraderRegistrationPage> {
             "&town=" +
             _town +
             "&trader_products=" +
-            _traderProducts.toString() +
+            actualProducts.toString() +
             "&trader_type=" +
             _type),
         headers: <String, String>{
