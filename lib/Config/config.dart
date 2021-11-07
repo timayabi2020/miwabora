@@ -13,3 +13,4 @@ const String COUNTRIES = "https://restcountries.com/v2/all";
 const String RESET_PASSWORD = "$ROOT/api/v1/reset";
 const String COMPLAIN = "$ROOT/api/v1/complain/store";
 const String QUESTION = "$ROOT/api/v1/question/store";
+const String SUGARCANE_ESTABLISHMENT = "$ROOT/api/v1/farmings";

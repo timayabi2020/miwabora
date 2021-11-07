@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:miwabora/Screens/Feedback/complaints.dart';
 import 'package:miwabora/Screens/Feedback/questions.dart';
 import 'package:miwabora/Screens/Login/login.dart';
+import 'package:miwabora/Screens/Mkulima/sugar_cane_establishment.dart';
 import 'package:miwabora/Screens/Profile/profile_breif.dart';
 import 'package:miwabora/constants.dart';
 
@@ -281,7 +282,7 @@ class _DashboardState extends State<Dashboard> {
                     return GestureDetector(
                       onTap: () {
                         // doPayment(position, context);
-                        //openServices(position, context);
+                        openMkulimaServices(position, context);
                       },
                       child: Card(
                         semanticContainer: true,
@@ -302,8 +303,7 @@ class _DashboardState extends State<Dashboard> {
                                           style:
                                               TextStyle(color: kPrimaryColor)),
                                       onPressed: () {
-                                        // openServices(
-                                        //   position, context);
+                                        openMkulimaServices(position, context);
                                       },
                                     ),
                                   ],
@@ -379,7 +379,7 @@ class _DashboardState extends State<Dashboard> {
                     return GestureDetector(
                       onTap: () {
                         // doPayment(position, context);
-                        //openServices(position, context);
+                        openServices(position, context);
                       },
                       child: Card(
                         semanticContainer: true,
@@ -400,8 +400,7 @@ class _DashboardState extends State<Dashboard> {
                                           style:
                                               TextStyle(color: kPrimaryColor)),
                                       onPressed: () {
-                                        // openServices(
-                                        //   position, context);
+                                        openServices(position, context);
                                       },
                                     ),
                                   ],
@@ -564,6 +563,28 @@ class _DashboardState extends State<Dashboard> {
       color: Colors.black,
       height: 10,
       thickness: 1.5,
+    );
+  }
+
+  void openServices(int position, BuildContext context) {
+    print(position);
+  }
+
+  void openMkulimaServices(int position, BuildContext context) {
+    print(position);
+    if (position == 2) {
+      navigateToSugarcaneEstablishment(context);
+    }
+  }
+
+  void navigateToSugarcaneEstablishment(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return SugarcaneEstablishmentPage();
+        },
+      ),
     );
   }
 }

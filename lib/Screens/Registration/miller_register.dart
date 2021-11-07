@@ -411,7 +411,7 @@ class _MillerRegistrationPageState extends State<MillerRegistrationPage> {
                                         color: Colors.white,
                                         // color: Color.fromRGBO(138, 170, 243, 0.5),
 
-                                        elevation: 2,
+                                        elevation: 5,
                                         child: Container(
                                             child: Row(children: [
                                           // Text(products[index]["name"]),
