@@ -7,16 +7,14 @@ import 'package:miwabora/Config/config.dart';
 import 'package:miwabora/Screens/Mkulima/common_description.dart';
 import 'package:miwabora/constants.dart';
 
-class SugarcaneEstablishmentPage extends StatefulWidget {
-  const SugarcaneEstablishmentPage({Key? key}) : super(key: key);
+class ProductionEnvironmentPage extends StatefulWidget {
+  const ProductionEnvironmentPage({Key? key}) : super(key: key);
 
   @override
-  _SugarcaneEstablishmentPageState createState() =>
-      _SugarcaneEstablishmentPageState();
+  _ProductionEnvironmentPage createState() => _ProductionEnvironmentPage();
 }
 
-class _SugarcaneEstablishmentPageState
-    extends State<SugarcaneEstablishmentPage> {
+class _ProductionEnvironmentPage extends State<ProductionEnvironmentPage> {
   List establishment = [];
   bool loading = true;
   @override
@@ -26,20 +24,6 @@ class _SugarcaneEstablishmentPageState
         establishment = data;
       });
     });
-  }
-
-  void _runFilter(String enteredKeyword) {
-    List results = [];
-    if (enteredKeyword.isEmpty) {
-      // if the search field is empty or only contains white-space, we'll display all users
-      results = establishment;
-    } else {
-      results = establishment
-          .where((s) =>
-              s["title"].toLowerCase().contains(enteredKeyword.toLowerCase()))
-          .toList();
-      // we use the toLowerCase() method to make it case-insensitive
-    }
   }
 
   @override
@@ -52,7 +36,7 @@ class _SugarcaneEstablishmentPageState
             Container(
               //padding: EdgeInsets.only(left: size.width * 0.05),
               //alignment: Alignment.centerLeft,
-              child: Text("Sugarcane Establishment",
+              child: Text("Production Environment",
                   style: TextStyle(
                       color: Colors.white,
                       fontSize: 18,
@@ -166,9 +150,8 @@ class _SugarcaneEstablishmentPageState
       List<dynamic> data = map["data"];
 
       //filter before returning data.
-      List<dynamic> filteredData = data
-          .where((e) => e["category"].toString() == "Soil and Fertilizer")
-          .toList();
+      List<dynamic> filteredData =
+          data.where((e) => e["category"].toString() == "production").toList();
       loading = false;
       return filteredData;
     }

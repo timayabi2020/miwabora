@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:miwabora/Screens/Feedback/complaints.dart';
 import 'package:miwabora/Screens/Feedback/questions.dart';
 import 'package:miwabora/Screens/Login/login.dart';
+import 'package:miwabora/Screens/Mkulima/cane_varieties.dart';
+import 'package:miwabora/Screens/Mkulima/production_environment.dart';
 import 'package:miwabora/Screens/Mkulima/sugar_cane_establishment.dart';
 import 'package:miwabora/Screens/Profile/profile_breif.dart';
 import 'package:miwabora/constants.dart';
@@ -572,8 +574,12 @@ class _DashboardState extends State<Dashboard> {
 
   void openMkulimaServices(int position, BuildContext context) {
     print(position);
-    if (position == 2) {
+    if (position == 1) {
+      navigateToproductionEnvironment(context);
+    } else if (position == 2) {
       navigateToSugarcaneEstablishment(context);
+    } else if (position == 3) {
+      navigateToCaneVariety(context);
     }
   }
 
@@ -583,6 +589,28 @@ class _DashboardState extends State<Dashboard> {
       MaterialPageRoute(
         builder: (context) {
           return SugarcaneEstablishmentPage();
+        },
+      ),
+    );
+  }
+
+  void navigateToproductionEnvironment(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return ProductionEnvironmentPage();
+        },
+      ),
+    );
+  }
+
+  void navigateToCaneVariety(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return CaneVarietyPage();
         },
       ),
     );

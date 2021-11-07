@@ -16,13 +16,30 @@ class MkulimaDescriptionPage extends StatelessWidget {
         body: SingleChildScrollView(
             child: Column(
           children: [
-            Container(child: Image.network(url.toString(), width: size.width)),
+            Container(
+                child: Image.network(
+              url.toString(),
+              width: size.width,
+              height: 200,
+              fit: BoxFit.cover,
+            )),
             Card(
                 color: Colors.white,
                 // color: Color.fromRGBO(138, 170, 243, 0.5),
 
                 elevation: 2,
-                child: Html(data: text))
+                child: Column(children: [
+                  Container(
+                      padding: EdgeInsets.only(left: size.width * 0.05),
+                      alignment: Alignment.topLeft,
+                      child: Text(
+                        "Description",
+                        style: TextStyle(color: Colors.redAccent),
+                      )),
+                  Container(
+                      padding: EdgeInsets.only(left: size.width * 0.05),
+                      child: Html(data: text))
+                ]))
           ],
         )));
   }

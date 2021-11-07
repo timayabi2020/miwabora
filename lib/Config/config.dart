@@ -14,3 +14,4 @@ const String RESET_PASSWORD = "$ROOT/api/v1/reset";
 const String COMPLAIN = "$ROOT/api/v1/complain/store";
 const String QUESTION = "$ROOT/api/v1/question/store";
 const String SUGARCANE_ESTABLISHMENT = "$ROOT/api/v1/farmings";
+const String CANE_VARIETY = "$ROOT/api/v1/CaneVariety";

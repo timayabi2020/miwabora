@@ -7,16 +7,14 @@ import 'package:miwabora/Config/config.dart';
 import 'package:miwabora/Screens/Mkulima/common_description.dart';
 import 'package:miwabora/constants.dart';
 
-class SugarcaneEstablishmentPage extends StatefulWidget {
-  const SugarcaneEstablishmentPage({Key? key}) : super(key: key);
+class CaneVarietyPage extends StatefulWidget {
+  const CaneVarietyPage({Key? key}) : super(key: key);
 
   @override
-  _SugarcaneEstablishmentPageState createState() =>
-      _SugarcaneEstablishmentPageState();
+  _CaneVarietyPage createState() => _CaneVarietyPage();
 }
 
-class _SugarcaneEstablishmentPageState
-    extends State<SugarcaneEstablishmentPage> {
+class _CaneVarietyPage extends State<CaneVarietyPage> {
   List establishment = [];
   bool loading = true;
   @override
@@ -36,7 +34,7 @@ class _SugarcaneEstablishmentPageState
     } else {
       results = establishment
           .where((s) =>
-              s["title"].toLowerCase().contains(enteredKeyword.toLowerCase()))
+              s["name"].toLowerCase().contains(enteredKeyword.toLowerCase()))
           .toList();
       // we use the toLowerCase() method to make it case-insensitive
     }
@@ -50,14 +48,15 @@ class _SugarcaneEstablishmentPageState
         appBar: AppBar(
           title: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
             Container(
-              //padding: EdgeInsets.only(left: size.width * 0.05),
-              //alignment: Alignment.centerLeft,
-              child: Text("Sugarcane Establishment",
+                //padding: EdgeInsets.only(left: size.width * 0.05),
+                //alignment: Alignment.centerLeft,
+                child: Flexible(
+              child: Text("Recommended Commercial Sugarcane Varieties",
                   style: TextStyle(
                       color: Colors.white,
                       fontSize: 18,
                       fontWeight: FontWeight.bold)),
-            ),
+            )),
             SizedBox(width: size.width * 0.03),
             Container(
               // padding: EdgeInsets.only(left: size.width * 0.20),
@@ -115,7 +114,7 @@ class _SugarcaneEstablishmentPageState
                                   padding:
                                       EdgeInsets.only(left: size.width * 0.05),
                                   child: Image.network(
-                                    "${establishment[index]['picture'][0]['url']}",
+                                    "${establishment[index]['photo']['url']}",
                                     height: 100,
                                     width: 100,
                                     fit: BoxFit.cover,
@@ -125,7 +124,7 @@ class _SugarcaneEstablishmentPageState
                                 Flexible(
                                   child: Container(
                                     child: Text(
-                                      "${establishment[index]['title']}",
+                                      "${establishment[index]['name']}",
                                       maxLines: 15,
                                       style: TextStyle(
                                           color: Colors.black,
@@ -155,8 +154,7 @@ class _SugarcaneEstablishmentPageState
     ioc.badCertificateCallback =
         (X509Certificate cert, String host, int port) => true;
     final http = new IOClient(ioc);
-    var res = await http
-        .get(Uri.parse(SUGARCANE_ESTABLISHMENT), headers: <String, String>{
+    var res = await http.get(Uri.parse(CANE_VARIETY), headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
       //'Authorization': 'AppBearer ' + token,
     });
@@ -166,9 +164,8 @@ class _SugarcaneEstablishmentPageState
       List<dynamic> data = map["data"];
 
       //filter before returning data.
-      List<dynamic> filteredData = data
-          .where((e) => e["category"].toString() == "Soil and Fertilizer")
-          .toList();
+      List<dynamic> filteredData =
+          data.where((e) => e["photo"] != null).toList();
       loading = false;
       return filteredData;
     }
@@ -176,8 +173,8 @@ class _SugarcaneEstablishmentPageState
 
   void moreDetails(int index, BuildContext context) {
     String description = establishment[index]["description"];
-    String title = establishment[index]["title"];
-    String imgUrl = establishment[index]['picture'][0]['url'];
+    String title = establishment[index]["name"];
+    String imgUrl = establishment[index]['photo']['url'];
 
     Navigator.push(
       context,
