@@ -15,3 +15,6 @@ const String COMPLAIN = "$ROOT/api/v1/complain/store";
 const String QUESTION = "$ROOT/api/v1/question/store";
 const String SUGARCANE_ESTABLISHMENT = "$ROOT/api/v1/farmings";
 const String CANE_VARIETY = "$ROOT/api/v1/CaneVariety";
+const String EXTENSION_OFFICERS = "$ROOT/api/v1/Extensionofficers";
+const String PUBLICATIONS = "$ROOT/api/v1/publications";
+const String DISEASE = "$ROOT/api/v1/sugarcane-diseases";

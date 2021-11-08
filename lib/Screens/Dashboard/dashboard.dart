@@ -4,9 +4,18 @@ import 'package:miwabora/Screens/Feedback/complaints.dart';
 import 'package:miwabora/Screens/Feedback/questions.dart';
 import 'package:miwabora/Screens/Login/login.dart';
 import 'package:miwabora/Screens/Mkulima/cane_varieties.dart';
+import 'package:miwabora/Screens/Mkulima/cba.dart';
+import 'package:miwabora/Screens/Mkulima/cba_templates.dart';
+import 'package:miwabora/Screens/Mkulima/crop_management.dart';
+import 'package:miwabora/Screens/Mkulima/diseases.dart';
+import 'package:miwabora/Screens/Mkulima/extension_officers.dart';
+import 'package:miwabora/Screens/Mkulima/gettingstarted.dart';
+import 'package:miwabora/Screens/Mkulima/harvesting.dart';
+import 'package:miwabora/Screens/Mkulima/innovation.dart';
 import 'package:miwabora/Screens/Mkulima/production_environment.dart';
 import 'package:miwabora/Screens/Mkulima/sugar_cane_establishment.dart';
 import 'package:miwabora/Screens/Profile/profile_breif.dart';
+import 'package:miwabora/components/forgot_password.dart';
 import 'package:miwabora/constants.dart';
 
 class Dashboard extends StatefulWidget {
@@ -25,6 +34,8 @@ class _DashboardState extends State<Dashboard> {
   String? _phone;
   String? _email;
   String? _userId;
+  String? _role;
+  String? _miller_id;
   _DashboardState(Map<String, String>? resultsMap) {
     this.details = resultsMap;
   }
@@ -40,13 +51,23 @@ class _DashboardState extends State<Dashboard> {
     String? userId = this.details!["userid"];
     String? phone = this.details!["phone"];
     String? email = this.details!["email"];
+    String? role = this.details!["role"];
 
     setState(() {
       _username = username;
       _email = email;
       _phone = phone;
       _userId = userId;
+      _role = role;
     });
+
+    if (role == "Farmer") {
+      String? miller = this.details!["miller_id"];
+      print("Here setting miller id " + miller.toString());
+      setState(() {
+        _miller_id = miller;
+      });
+    }
   }
 
   List mkulimaList = [
@@ -90,6 +111,13 @@ class _DashboardState extends State<Dashboard> {
   List feedbackList = [
     _FeedbackItem('assets/images/ic_qns_foreground.png', 'Ask a question'),
     _FeedbackItem('assets/images/Raise-a-complain.png', 'Raise a Complaint'),
+  ];
+
+  List diseaseList = [
+    _DiseaseItem('assets/images/ic_pest_foreground.png', 'Diseases'),
+    _DiseaseItem('assets/images/ic_pest_foreground.png', 'Pests'),
+    _DiseaseItem('assets/images/ic_pest_foreground.png', 'Weeds'),
+    _DiseaseItem('assets/images/ic_cam_cam.png', 'Disease Diagnosis'),
   ];
 
   @override
@@ -284,7 +312,7 @@ class _DashboardState extends State<Dashboard> {
                     return GestureDetector(
                       onTap: () {
                         // doPayment(position, context);
-                        openMkulimaServices(position, context);
+                        openMkulimaServices(position, context, size);
                       },
                       child: Card(
                         semanticContainer: true,
@@ -305,7 +333,8 @@ class _DashboardState extends State<Dashboard> {
                                           style:
                                               TextStyle(color: kPrimaryColor)),
                                       onPressed: () {
-                                        openMkulimaServices(position, context);
+                                        openMkulimaServices(
+                                            position, context, size);
                                       },
                                     ),
                                   ],
@@ -572,14 +601,28 @@ class _DashboardState extends State<Dashboard> {
     print(position);
   }
 
-  void openMkulimaServices(int position, BuildContext context) {
+  void openMkulimaServices(int position, BuildContext context, Size size) {
     print(position);
-    if (position == 1) {
+    if (position == 0) {
+      navigateToBeginner(context);
+    } else if (position == 1) {
       navigateToproductionEnvironment(context);
     } else if (position == 2) {
       navigateToSugarcaneEstablishment(context);
     } else if (position == 3) {
       navigateToCaneVariety(context);
+    } else if (position == 4) {
+      navigateToCropManagement(context);
+    } else if (position == 5) {
+      diseasesOptions(context, size);
+    } else if (position == 6) {
+      navigateToHarvesting(context);
+    } else if (position == 7) {
+      navigateToInnovation(context);
+    } else if (position == 8) {
+      farmRecordsOptions(context, size);
+    } else if (position == 9) {
+      navigateToOfficers(context);
     }
   }
 
@@ -615,6 +658,250 @@ class _DashboardState extends State<Dashboard> {
       ),
     );
   }
+
+  void navigateToCropManagement(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return CropManagementPage();
+        },
+      ),
+    );
+  }
+
+  void navigateToHarvesting(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return HarvestingPage();
+        },
+      ),
+    );
+  }
+
+  void navigateToInnovation(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return InnovationPage();
+        },
+      ),
+    );
+  }
+
+  void navigateToOfficers(BuildContext context) {
+    //print("=====> " + _miller_id.toString());
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return OfficersPage(_miller_id.toString());
+        },
+      ),
+    );
+  }
+
+  void navigateToBeginner(BuildContext context) {
+    //print("=====> " + _miller_id.toString());
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return GettingStartedPage();
+        },
+      ),
+    );
+  }
+
+  void farmRecordsOptions(BuildContext context, Size size) {
+    showDialog(
+        context: context,
+        builder: (_) {
+          return AlertDialog(
+            title: Text("Select below"),
+            content: SingleChildScrollView(
+              child: Column(
+                // crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                          // alignment: Alignment.center,
+                          width: 115,
+                          child: Card(
+                              semanticContainer: true,
+                              child: Column(children: [
+                                Image.asset(
+                                  "assets/images/ic_year_foreground.png",
+                                  width: 150,
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    this.goToCBA(context);
+                                  },
+                                  // onTap: press,
+                                  //  child: Container(
+                                  child: Text(
+                                    "Farm Records & C.B.A",
+                                    maxLines: 20,
+                                    style: TextStyle(
+                                      color: kPrimaryColor,
+                                    ),
+                                  ),
+                                )
+                              ]))),
+                      Container(
+                        width: 115,
+                        child: Card(
+                            child: Column(children: [
+                          Image.asset(
+                            "assets/images/ic_year_foreground.png",
+                            width: 150,
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              this.goToTemplates(context);
+                            },
+                            // onTap: press,
+                            //child: Container(
+                            child: Text(
+                              "Farm Records & C.B.A Templates",
+                              maxLines: 20,
+                              style: TextStyle(
+                                color: kPrimaryColor,
+                              ),
+                            ),
+                          )
+                        ])),
+                      )
+                    ],
+                  ),
+                  SizedBox(height: size.height * 0.05),
+                  Row(
+                    children: [
+                      ResetPassword(
+                        press: () {
+                          Navigator.of(context).pop();
+                        },
+                        text: 'Cancel',
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
+  void diseasesOptions(BuildContext context, Size size) {
+    showDialog(
+        context: context,
+        builder: (_) {
+          return AlertDialog(
+              title: Text("Select below"),
+              content: Container(
+                //width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height / 2,
+                //padding: EdgeInsets.all(10),
+                color: Colors.white,
+                child: GridView.builder(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2),
+                  itemBuilder: (context, position) {
+                    return GestureDetector(
+                        onTap: () {
+                          diseaseTap(context, position);
+                        },
+                        child: Container(
+                          height: 100,
+                          child: Card(
+                            semanticContainer: true,
+                            elevation: 5,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  diseaseList[position].icon.toString(),
+                                  height: 50,
+                                ),
+                                Align(
+                                    alignment: Alignment.bottomCenter,
+                                    child: Column(
+                                      children: [
+                                        TextButton(
+                                          child: Text(
+                                              diseaseList[position].title,
+                                              style: TextStyle(
+                                                  color: kPrimaryColor)),
+                                          onPressed: () {
+                                            diseaseTap(context, position);
+                                          },
+                                        ),
+                                      ],
+                                    )),
+                              ],
+                            ),
+                          ),
+                        ));
+                  },
+                  itemCount: diseaseList.length,
+                ),
+              ));
+        });
+  }
+
+  goToTemplates(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return CBATemplatePage();
+        },
+      ),
+    );
+  }
+
+  goToCBA(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return CBAPage();
+        },
+      ),
+    );
+  }
+
+  void diseaseTap(BuildContext context, int position) {
+    if (position == 0) {
+      navigateToDisease(context);
+    } else if (position == 1) {
+    } else if (position == 2) {
+    } else if (position == 3) {
+    } else {}
+  }
+
+  void navigateToDisease(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return DiseasesPage();
+        },
+      ),
+    );
+  }
+}
+
+class _DiseaseItem {
+  final String icon;
+  final String title;
+
+  _DiseaseItem(this.icon, this.title);
 }
 
 class _FeedbackItem {

@@ -7,16 +7,14 @@ import 'package:miwabora/Config/config.dart';
 import 'package:miwabora/Screens/Mkulima/common_description.dart';
 import 'package:miwabora/constants.dart';
 
-class SugarcaneEstablishmentPage extends StatefulWidget {
-  const SugarcaneEstablishmentPage({Key? key}) : super(key: key);
+class CBAPage extends StatefulWidget {
+  const CBAPage({Key? key}) : super(key: key);
 
   @override
-  _SugarcaneEstablishmentPageState createState() =>
-      _SugarcaneEstablishmentPageState();
+  _CBAPageState createState() => _CBAPageState();
 }
 
-class _SugarcaneEstablishmentPageState
-    extends State<SugarcaneEstablishmentPage> {
+class _CBAPageState extends State<CBAPage> {
   List establishment = [];
   bool loading = true;
   @override
@@ -36,15 +34,17 @@ class _SugarcaneEstablishmentPageState
         appBar: AppBar(
           title: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
             Container(
-              //padding: EdgeInsets.only(left: size.width * 0.05),
-              //alignment: Alignment.centerLeft,
-              child: Text("Sugarcane Establishment",
+                //padding: EdgeInsets.only(left: size.width * 0.05),
+                //alignment: Alignment.centerLeft,
+                child: Flexible(
+              child: Text("Farm Reocrds & Cost Benefit Analysis",
+                  maxLines: 20,
                   style: TextStyle(
                       color: Colors.white,
                       fontSize: 18,
                       fontWeight: FontWeight.bold)),
-            ),
-            SizedBox(width: size.width * 0.03),
+            )),
+            //SizedBox(width: size.width * 0.03),
             Container(
               // padding: EdgeInsets.only(left: size.width * 0.20),
               // alignment: Alignment.topRight,
@@ -159,9 +159,8 @@ class _SugarcaneEstablishmentPageState
       List<dynamic> data = map["data"];
 
       //filter before returning data.
-      List<dynamic> filteredData = data
-          .where((e) => e["category"].toString() == "Soil and Fertilizer")
-          .toList();
+      List<dynamic> filteredData =
+          data.where((e) => e["category"].toString() == "farm").toList();
       loading = false;
       return filteredData;
     }

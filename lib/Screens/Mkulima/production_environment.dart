@@ -98,23 +98,30 @@ class _ProductionEnvironmentPage extends State<ProductionEnvironmentPage> {
                                 Container(
                                   padding:
                                       EdgeInsets.only(left: size.width * 0.05),
-                                  child: Image.network(
-                                    "${establishment[index]['picture'][0]['url']}",
-                                    height: 100,
-                                    width: 100,
-                                    fit: BoxFit.cover,
-                                  ),
+                                  child: establishment.length == 0
+                                      ? Image.asset(
+                                          "assets/images/ic_farm_demo_foreground",
+                                          width: 250,
+                                        )
+                                      : Image.network(
+                                          "${establishment[index]['picture'][0]['url']}",
+                                          height: 100,
+                                          width: 100,
+                                          fit: BoxFit.cover,
+                                        ),
                                 ),
                                 const SizedBox(width: 8),
                                 Flexible(
                                   child: Container(
-                                    child: Text(
-                                      "${establishment[index]['title']}",
-                                      maxLines: 15,
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold),
-                                    ),
+                                    child: establishment.length == 0
+                                        ? Text("Loading data...")
+                                        : Text(
+                                            "${establishment[index]['title']}",
+                                            maxLines: 15,
+                                            style: TextStyle(
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.bold),
+                                          ),
                                   ),
                                 ),
                               ]))));

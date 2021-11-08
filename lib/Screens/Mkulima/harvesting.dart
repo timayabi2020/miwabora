@@ -7,16 +7,14 @@ import 'package:miwabora/Config/config.dart';
 import 'package:miwabora/Screens/Mkulima/common_description.dart';
 import 'package:miwabora/constants.dart';
 
-class SugarcaneEstablishmentPage extends StatefulWidget {
-  const SugarcaneEstablishmentPage({Key? key}) : super(key: key);
+class HarvestingPage extends StatefulWidget {
+  const HarvestingPage({Key? key}) : super(key: key);
 
   @override
-  _SugarcaneEstablishmentPageState createState() =>
-      _SugarcaneEstablishmentPageState();
+  _HarvestingPageState createState() => _HarvestingPageState();
 }
 
-class _SugarcaneEstablishmentPageState
-    extends State<SugarcaneEstablishmentPage> {
+class _HarvestingPageState extends State<HarvestingPage> {
   List establishment = [];
   bool loading = true;
   @override
@@ -38,7 +36,7 @@ class _SugarcaneEstablishmentPageState
             Container(
               //padding: EdgeInsets.only(left: size.width * 0.05),
               //alignment: Alignment.centerLeft,
-              child: Text("Sugarcane Establishment",
+              child: Text("Harvesting & Transport",
                   style: TextStyle(
                       color: Colors.white,
                       fontSize: 18,
@@ -159,9 +157,8 @@ class _SugarcaneEstablishmentPageState
       List<dynamic> data = map["data"];
 
       //filter before returning data.
-      List<dynamic> filteredData = data
-          .where((e) => e["category"].toString() == "Soil and Fertilizer")
-          .toList();
+      List<dynamic> filteredData =
+          data.where((e) => e["category"].toString() == "Farm Demo").toList();
       loading = false;
       return filteredData;
     }

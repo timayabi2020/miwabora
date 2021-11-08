@@ -16,12 +16,14 @@ class CaneVarietyPage extends StatefulWidget {
 
 class _CaneVarietyPage extends State<CaneVarietyPage> {
   List establishment = [];
+  List searchList = [];
   bool loading = true;
   @override
   void initState() {
     fetchFarmings().then((data) {
       setState(() {
         establishment = data;
+        searchList = data;
       });
     });
   }
@@ -38,6 +40,9 @@ class _CaneVarietyPage extends State<CaneVarietyPage> {
           .toList();
       // we use the toLowerCase() method to make it case-insensitive
     }
+    setState(() {
+      searchList = results;
+    });
   }
 
   @override
@@ -52,6 +57,7 @@ class _CaneVarietyPage extends State<CaneVarietyPage> {
                 //alignment: Alignment.centerLeft,
                 child: Flexible(
               child: Text("Recommended Commercial Sugarcane Varieties",
+                  maxLines: 15,
                   style: TextStyle(
                       color: Colors.white,
                       fontSize: 18,
@@ -86,6 +92,12 @@ class _CaneVarietyPage extends State<CaneVarietyPage> {
                 child: Container(
                     child: Column(
               children: <Widget>[
+                TextField(
+                  onChanged: (value) => _runFilter(value),
+                  decoration: InputDecoration(
+                      labelText: 'Search here...',
+                      suffixIcon: Icon(Icons.search)),
+                ),
                 ListView.builder(
                     /*gridDelegate:
                               SliverGridDelegateWithFixedCrossAxisCount(
@@ -96,7 +108,7 @@ class _CaneVarietyPage extends State<CaneVarietyPage> {
                           ),*/
                     physics: NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
-                    itemCount: establishment.length,
+                    itemCount: searchList.length,
                     itemBuilder: (context, index) {
                       return GestureDetector(
                           onTap: () {
@@ -113,23 +125,30 @@ class _CaneVarietyPage extends State<CaneVarietyPage> {
                                 Container(
                                   padding:
                                       EdgeInsets.only(left: size.width * 0.05),
-                                  child: Image.network(
-                                    "${establishment[index]['photo']['url']}",
-                                    height: 100,
-                                    width: 100,
-                                    fit: BoxFit.cover,
-                                  ),
+                                  child: establishment.length == 0
+                                      ? Image.asset(
+                                          "assets/images/ic_farm_demo_foreground",
+                                          width: 250,
+                                        )
+                                      : Image.network(
+                                          "${searchList[index]['photo']['url']}",
+                                          height: 100,
+                                          width: 100,
+                                          fit: BoxFit.cover,
+                                        ),
                                 ),
                                 const SizedBox(width: 8),
                                 Flexible(
                                   child: Container(
-                                    child: Text(
-                                      "${establishment[index]['name']}",
-                                      maxLines: 15,
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold),
-                                    ),
+                                    child: establishment.length == 0
+                                        ? Text("Loading data...")
+                                        : Text(
+                                            "${searchList[index]['name']}",
+                                            maxLines: 15,
+                                            style: TextStyle(
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.bold),
+                                          ),
                                   ),
                                 ),
                               ]))));

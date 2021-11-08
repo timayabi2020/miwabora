@@ -5,26 +5,45 @@ import 'package:flutter/material.dart';
 import 'package:http/io_client.dart';
 import 'package:miwabora/Config/config.dart';
 import 'package:miwabora/Screens/Mkulima/common_description.dart';
+import 'package:miwabora/Screens/Mkulima/common_disease_description.dart';
 import 'package:miwabora/constants.dart';
 
-class SugarcaneEstablishmentPage extends StatefulWidget {
-  const SugarcaneEstablishmentPage({Key? key}) : super(key: key);
+class DiseasesPage extends StatefulWidget {
+  const DiseasesPage({Key? key}) : super(key: key);
 
   @override
-  _SugarcaneEstablishmentPageState createState() =>
-      _SugarcaneEstablishmentPageState();
+  _DiseasesPage createState() => _DiseasesPage();
 }
 
-class _SugarcaneEstablishmentPageState
-    extends State<SugarcaneEstablishmentPage> {
+class _DiseasesPage extends State<DiseasesPage> {
   List establishment = [];
+  List searchList = [];
   bool loading = true;
   @override
   void initState() {
     fetchFarmings().then((data) {
       setState(() {
         establishment = data;
+        searchList = data;
       });
+    });
+  }
+
+  void _runFilter(String enteredKeyword) {
+    List results = [];
+    if (enteredKeyword.isEmpty) {
+      // if the search field is empty or only contains white-space, we'll display all users
+      results = establishment;
+    } else {
+      results = establishment
+          .where((s) => s["sugarcane_diseases_name"]
+              .toLowerCase()
+              .contains(enteredKeyword.toLowerCase()))
+          .toList();
+      // we use the toLowerCase() method to make it case-insensitive
+    }
+    setState(() {
+      searchList = results;
     });
   }
 
@@ -36,14 +55,16 @@ class _SugarcaneEstablishmentPageState
         appBar: AppBar(
           title: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
             Container(
-              //padding: EdgeInsets.only(left: size.width * 0.05),
-              //alignment: Alignment.centerLeft,
-              child: Text("Sugarcane Establishment",
+                //padding: EdgeInsets.only(left: size.width * 0.05),
+                //alignment: Alignment.centerLeft,
+                child: Flexible(
+              child: Text("Diseases",
+                  maxLines: 15,
                   style: TextStyle(
                       color: Colors.white,
                       fontSize: 18,
                       fontWeight: FontWeight.bold)),
-            ),
+            )),
             SizedBox(width: size.width * 0.03),
             Container(
               // padding: EdgeInsets.only(left: size.width * 0.20),
@@ -73,6 +94,12 @@ class _SugarcaneEstablishmentPageState
                 child: Container(
                     child: Column(
               children: <Widget>[
+                TextField(
+                  onChanged: (value) => _runFilter(value),
+                  decoration: InputDecoration(
+                      labelText: 'Search here...',
+                      suffixIcon: Icon(Icons.search)),
+                ),
                 ListView.builder(
                     /*gridDelegate:
                               SliverGridDelegateWithFixedCrossAxisCount(
@@ -83,7 +110,7 @@ class _SugarcaneEstablishmentPageState
                           ),*/
                     physics: NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
-                    itemCount: establishment.length,
+                    itemCount: searchList.length,
                     itemBuilder: (context, index) {
                       return GestureDetector(
                           onTap: () {
@@ -106,7 +133,7 @@ class _SugarcaneEstablishmentPageState
                                           width: 250,
                                         )
                                       : Image.network(
-                                          "${establishment[index]['picture'][0]['url']}",
+                                          "${searchList[index]['disease_picture']['url']}",
                                           height: 100,
                                           width: 100,
                                           fit: BoxFit.cover,
@@ -118,7 +145,7 @@ class _SugarcaneEstablishmentPageState
                                     child: establishment.length == 0
                                         ? Text("Loading data...")
                                         : Text(
-                                            "${establishment[index]['title']}",
+                                            "${searchList[index]['sugarcane_diseases_name']}",
                                             maxLines: 15,
                                             style: TextStyle(
                                                 color: Colors.black,
@@ -148,8 +175,7 @@ class _SugarcaneEstablishmentPageState
     ioc.badCertificateCallback =
         (X509Certificate cert, String host, int port) => true;
     final http = new IOClient(ioc);
-    var res = await http
-        .get(Uri.parse(SUGARCANE_ESTABLISHMENT), headers: <String, String>{
+    var res = await http.get(Uri.parse(DISEASE), headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
       //'Authorization': 'AppBearer ' + token,
     });
@@ -158,28 +184,26 @@ class _SugarcaneEstablishmentPageState
       Map<String, dynamic> map = json.decode(res.body);
       List<dynamic> data = map["data"];
 
-      //filter before returning data.
-      List<dynamic> filteredData = data
-          .where((e) => e["category"].toString() == "Soil and Fertilizer")
-          .toList();
       loading = false;
-      return filteredData;
+      return data;
     }
   }
 
   void moreDetails(int index, BuildContext context) {
-    String description = establishment[index]["description"];
-    String title = establishment[index]["title"];
-    String imgUrl = establishment[index]['picture'][0]['url'];
+    String description = establishment[index]["symptoms"];
+    String title = establishment[index]["sugarcane_diseases_name"];
+    String imgUrl = establishment[index]['disease_picture']['url'];
+    String management = establishment[index]['management'];
 
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) {
-          return MkulimaDescriptionPage(
+          return MkulimaDiseaseDescriptionPage(
             text: description,
             title: title,
             url: imgUrl,
+            management: management,
           );
         },
       ),
