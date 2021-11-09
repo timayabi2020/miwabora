@@ -8,6 +8,7 @@ import 'package:miwabora/constants.dart';
 import 'dart:math' as math;
 
 import 'package:expandable/expandable.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FaqState extends StatefulWidget {
   String? title;
@@ -29,7 +30,7 @@ class _FaqState extends State<FaqState> {
   }
   @override
   void initState() {
-    fetchfaqs().then((data) {
+    getData().then((data) {
       setState(() {
         categories = data;
       });
@@ -121,13 +122,47 @@ class _FaqState extends State<FaqState> {
     if (res.statusCode == 200) {
       //var obj = json.decode(res.body);
       Map<String, dynamic> map = json.decode(res.body);
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString("faq", res.body);
       List<dynamic> data = map["data"];
       //filter before returning data.
       List<dynamic> filteredData = data
           .where((e) => e["category"]["id"].toString() == _catId.toString())
           .toList();
       loading = false;
+      setState(() {
+        categories = filteredData;
+      });
       return filteredData;
     }
+  }
+
+  Future<List> getData() async {
+    List<dynamic> filteredData = [];
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    if (prefs.getString("faq") == null) {
+      fetchfaqs().then((data) {
+        setState(() {
+          categories = data;
+        });
+      });
+    } else {
+      setState(() {
+        loading = true;
+      });
+      String storedData = prefs.getString("faq").toString();
+      Map<String, dynamic> map = json.decode(storedData);
+      List<dynamic> data = map["data"];
+
+      //filter before returning data.
+      filteredData = data
+          .where((e) => e["category"]["id"].toString() == _catId.toString())
+          .toList();
+      setState(() {
+        loading = false;
+      });
+    }
+    return filteredData;
   }
 }

@@ -6,6 +6,7 @@ import 'package:http/io_client.dart';
 import 'package:miwabora/Config/config.dart';
 import 'package:miwabora/Screens/Help/faq.dart';
 import 'package:miwabora/constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Help extends StatefulWidget {
   const Help({Key? key}) : super(key: key);
@@ -19,7 +20,7 @@ class _HelpState extends State<Help> {
   bool loading = true;
   @override
   void initState() {
-    fetchCategories().then((data) {
+    getData().then((data) {
       setState(() {
         categories = data;
       });
@@ -128,13 +129,45 @@ class _HelpState extends State<Help> {
     if (res.statusCode == 200) {
       //var obj = json.decode(res.body);
       Map<String, dynamic> map = json.decode(res.body);
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString("help", res.body);
       List<dynamic> data = map["data"];
       //filter before returning data.
       List<dynamic> filteredData =
           data.where((e) => e["name"] != null).toList();
       loading = false;
+      setState(() {
+        categories = filteredData;
+      });
       return filteredData;
     }
+  }
+
+  Future<List> getData() async {
+    List<dynamic> filteredData = [];
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    if (prefs.getString("help") == null) {
+      fetchCategories().then((data) {
+        setState(() {
+          categories = data;
+        });
+      });
+    } else {
+      setState(() {
+        loading = true;
+      });
+      String storedData = prefs.getString("help").toString();
+      Map<String, dynamic> map = json.decode(storedData);
+      List<dynamic> data = map["data"];
+
+      //filter before returning data.
+      filteredData = data.where((e) => e["name"] != null).toList();
+      setState(() {
+        loading = false;
+      });
+    }
+    return filteredData;
   }
 
   void moreDetails(int index, BuildContext context) {

@@ -4,8 +4,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/io_client.dart';
 import 'package:miwabora/Config/config.dart';
+import 'package:miwabora/Network/network.dart';
 import 'package:miwabora/Screens/Mkulima/common_description.dart';
 import 'package:miwabora/Screens/Mkulima/common_disease_description.dart';
+import 'package:miwabora/components/rounded_button.dart';
 import 'package:miwabora/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -20,8 +22,10 @@ class _DiseasesPage extends State<DiseasesPage> {
   List establishment = [];
   List searchList = [];
   bool loading = true;
+  bool internetCheck = false;
   @override
   void initState() {
+    networkCheck();
     getData().then((data) {
       setState(() {
         establishment = data;
@@ -72,11 +76,13 @@ class _DiseasesPage extends State<DiseasesPage> {
                 ),
                 color: Colors.white,
                 onPressed: () => {
-                  fetchFarmings().then((data) {
-                    setState(() {
-                      establishment = data;
-                    });
-                  })
+                  this.internetCheck == false
+                      ? showNetworkError(context)
+                      : fetchFarmings().then((data) {
+                          setState(() {
+                            establishment = data;
+                          });
+                        })
                 },
               )
             ]),
@@ -119,10 +125,10 @@ class _DiseasesPage extends State<DiseasesPage> {
                                 Container(
                                   padding:
                                       EdgeInsets.only(left: size.width * 0.05),
-                                  child: establishment.length == 0
+                                  child: this.internetCheck == false
                                       ? Image.asset(
-                                          "assets/images/ic_farm_demo_foreground",
-                                          width: 250,
+                                          "assets/images/ic_pest_foreground.png",
+                                          width: 100,
                                         )
                                       : Image.network(
                                           "${searchList[index]['disease_picture']['url']}",
@@ -163,24 +169,29 @@ class _DiseasesPage extends State<DiseasesPage> {
 
   Future fetchFarmings() async {
     loading = true;
-    final ioc = new HttpClient();
-    ioc.badCertificateCallback =
-        (X509Certificate cert, String host, int port) => true;
-    final http = new IOClient(ioc);
-    var res = await http.get(Uri.parse(DISEASE), headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-      //'Authorization': 'AppBearer ' + token,
-    });
-    if (res.statusCode == 200) {
-      //var obj = json.decode(res.body);
-      Map<String, dynamic> map = json.decode(res.body);
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setString("diseases", res.body);
-      List<dynamic> data = map["data"];
+    List<dynamic> data = [];
+    try {
+      final ioc = new HttpClient();
+      ioc.badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+      final http = new IOClient(ioc);
+      var res = await http.get(Uri.parse(DISEASE), headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        //'Authorization': 'AppBearer ' + token,
+      });
+      if (res.statusCode == 200) {
+        //var obj = json.decode(res.body);
+        Map<String, dynamic> map = json.decode(res.body);
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString("diseases", res.body);
+        data = map["data"];
 
+        loading = false;
+      }
+    } catch (e) {
       loading = false;
-      return data;
     }
+    return data;
   }
 
   Future<List> getData() async {
@@ -225,9 +236,55 @@ class _DiseasesPage extends State<DiseasesPage> {
             title: title,
             url: imgUrl,
             management: management,
+            internetCheck: this.internetCheck,
           );
         },
       ),
     );
+  }
+
+  confirmInternet(BuildContext context) async {
+    await networkCheck();
+    Navigator.of(context).pop();
+  }
+
+  networkCheck() async {
+    NetworkCheck networkCheck = new NetworkCheck();
+    bool check = await networkCheck.check();
+
+    _networkconnectionChange(check);
+  }
+
+  void _networkconnectionChange(bool internet) {
+    setState(() {
+      internetCheck = internet;
+    });
+  }
+
+  showNetworkError(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (_) {
+          return AlertDialog(
+            title: Text("Connectivity Error"),
+            content: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Please check your internet connection and try again"),
+                  RoundedButton(
+                    text: "CANCEL",
+                    sizeval: 0.7,
+                    color: kPrimaryColor,
+                    press: () {
+                      //navigateToDashBoard(context);
+                      confirmInternet(context);
+                    },
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
   }
 }

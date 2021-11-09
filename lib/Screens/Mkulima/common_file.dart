@@ -6,7 +6,9 @@ class MkulimaFilePage extends StatelessWidget {
   final String? url;
   final String? title;
   final String? pdf;
-  const MkulimaFilePage({Key? key, this.text, this.url, this.title, this.pdf})
+  final bool? internetCheck;
+  const MkulimaFilePage(
+      {Key? key, this.text, this.url, this.title, this.pdf, this.internetCheck})
       : super(key: key);
 
   @override
@@ -18,12 +20,17 @@ class MkulimaFilePage extends StatelessWidget {
             child: Column(
           children: [
             Container(
-                child: Image.network(
-              url.toString(),
-              width: size.width,
-              height: 200,
-              fit: BoxFit.cover,
-            )),
+                child: internetCheck == false
+                    ? Image.asset(
+                        "assets/images/logobora.png",
+                        width: 250,
+                      )
+                    : Image.network(
+                        url.toString(),
+                        width: size.width,
+                        height: 200,
+                        fit: BoxFit.cover,
+                      )),
             Card(
                 color: Colors.white,
                 // color: Color.fromRGBO(138, 170, 243, 0.5),

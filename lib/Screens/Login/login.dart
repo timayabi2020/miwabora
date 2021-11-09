@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:http/io_client.dart';
 import 'package:miwabora/Config/config.dart';
+import 'package:miwabora/Network/network.dart';
 import 'package:miwabora/Screens/Dashboard/dashboard.dart';
 import 'package:miwabora/Screens/Login/password_reset.dart';
 import 'package:miwabora/Screens/Registration/farmer_registration.dart';
@@ -30,9 +31,11 @@ class _LoginPageState extends State<LoginPage> {
   String _confirmPassword = '';
   String _newPassword = '';
   bool _passwordVisible = false;
+  bool internetCheck = false;
 
   @override
   void initState() {
+    networkCheck();
     _passwordVisible = !_passwordVisible;
   }
 
@@ -181,8 +184,12 @@ class _LoginPageState extends State<LoginPage> {
                           sizeval: 0.7,
                           color: kPrimaryColor,
                           press: () {
-                            //  buildShowDialog(context);
-                            loginDialog(context);
+                            if (this.internetCheck == false) {
+                              //push dialog
+                              showNetworkError(context);
+                            } else {
+                              loginDialog(context);
+                            }
                           },
                         ),
                         // SizedBox(height: size.height * 0.05),
@@ -192,7 +199,12 @@ class _LoginPageState extends State<LoginPage> {
                           color: kPrimaryColor,
                           press: () {
                             //  buildShowDialog(context);
-                            registrationOptions(context, size);
+                            if (this.internetCheck == false) {
+                              //push dialog
+                              showNetworkError(context);
+                            } else {
+                              registrationOptions(context, size);
+                            }
                           },
                         )
                       ],
@@ -201,6 +213,51 @@ class _LoginPageState extends State<LoginPage> {
 // This trailing comma makes auto-formatting nicer for build methods.
               ))
     ]);
+  }
+
+  showNetworkError(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (_) {
+          return AlertDialog(
+            title: Text("Connectivity Error"),
+            content: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Please check your internet connection and try again"),
+                  RoundedButton(
+                    text: "CANCEL",
+                    sizeval: 0.7,
+                    color: kPrimaryColor,
+                    press: () {
+                      //navigateToDashBoard(context);
+                      confirmInternet(context);
+                    },
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
+  confirmInternet(BuildContext context) async {
+    await networkCheck();
+    Navigator.of(context).pop();
+  }
+
+  networkCheck() async {
+    NetworkCheck networkCheck = new NetworkCheck();
+    bool check = await networkCheck.check();
+
+    _networkconnectionChange(check);
+  }
+
+  void _networkconnectionChange(bool internet) {
+    setState(() {
+      internetCheck = internet;
+    });
   }
 
   registrationOptions(BuildContext context, Size size) {
@@ -221,7 +278,12 @@ class _LoginPageState extends State<LoginPage> {
                         sizeval: 0.7,
                         color: kPrimaryColor,
                         press: () {
-                          navigateToFarmerRegistration(context);
+                          if (this.internetCheck == false) {
+                            //push dialog
+                            showNetworkError(context);
+                          } else {
+                            navigateToFarmerRegistration(context);
+                          }
                           //confirmInternet(context);
                         },
                       )),
@@ -235,7 +297,12 @@ class _LoginPageState extends State<LoginPage> {
                         sizeval: 0.7,
                         color: kPrimaryColor,
                         press: () {
-                          navigateToTraderrRegistration(context);
+                          if (this.internetCheck == false) {
+                            //push dialog
+                            showNetworkError(context);
+                          } else {
+                            navigateToTraderrRegistration(context);
+                          }
                         },
                       )),
                     ],
@@ -248,7 +315,12 @@ class _LoginPageState extends State<LoginPage> {
                         sizeval: 0.7,
                         color: kPrimaryColor,
                         press: () {
-                          navigateToMillerRegistration(context);
+                          if (this.internetCheck == false) {
+                            //push dialog
+                            showNetworkError(context);
+                          } else {
+                            navigateToMillerRegistration(context);
+                          }
                           //confirmInternet(context);
                         },
                       )),
@@ -262,7 +334,12 @@ class _LoginPageState extends State<LoginPage> {
                         sizeval: 0.7,
                         color: kPrimaryColor,
                         press: () {
-                          navigateToOtherRegistration(context);
+                          if (this.internetCheck == false) {
+                            //push dialog
+                            showNetworkError(context);
+                          } else {
+                            navigateToOtherRegistration(context);
+                          }
                           //confirmInternet(context);
                         },
                       )),

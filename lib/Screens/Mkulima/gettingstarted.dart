@@ -5,8 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:http/io_client.dart';
 import 'package:miwabora/Config/config.dart';
+import 'package:miwabora/Network/network.dart';
 import 'package:miwabora/Screens/Mkulima/common_description.dart';
+import 'package:miwabora/components/rounded_button.dart';
 import 'package:miwabora/constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class GettingStartedPage extends StatefulWidget {
   const GettingStartedPage({Key? key}) : super(key: key);
@@ -18,9 +21,11 @@ class GettingStartedPage extends StatefulWidget {
 class _GettingStartedPageState extends State<GettingStartedPage> {
   List establishment = [];
   bool loading = true;
+  bool internetCheck = false;
   @override
   void initState() {
-    fetchFarmings().then((data) {
+    networkCheck();
+    getData().then((data) {
       setState(() {
         establishment = data;
       });
@@ -44,9 +49,9 @@ class _GettingStartedPageState extends State<GettingStartedPage> {
             child: Column(
               children: [
                 Container(
-                    child: establishment.length == 0
+                    child: this.internetCheck == false
                         ? Image.asset(
-                            "assets/images/ic_miwa_logo.png",
+                            "assets/images/logobora.png",
                             width: 250,
                           )
                         : Image.network(
@@ -88,26 +93,61 @@ class _GettingStartedPageState extends State<GettingStartedPage> {
 
   Future fetchFarmings() async {
     loading = true;
-    final ioc = new HttpClient();
-    ioc.badCertificateCallback =
-        (X509Certificate cert, String host, int port) => true;
-    final http = new IOClient(ioc);
-    var res = await http
-        .get(Uri.parse(SUGARCANE_ESTABLISHMENT), headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-      //'Authorization': 'AppBearer ' + token,
-    });
-    if (res.statusCode == 200) {
-      //var obj = json.decode(res.body);
-      Map<String, dynamic> map = json.decode(res.body);
+    List<dynamic> filteredData = [];
+    try {
+      final ioc = new HttpClient();
+      ioc.badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+      final http = new IOClient(ioc);
+      var res = await http
+          .get(Uri.parse(SUGARCANE_ESTABLISHMENT), headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        //'Authorization': 'AppBearer ' + token,
+      });
+      if (res.statusCode == 200) {
+        //var obj = json.decode(res.body);
+        Map<String, dynamic> map = json.decode(res.body);
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString("getting_started", res.body);
+        List<dynamic> data = map["data"];
+
+        //filter before returning data.
+        List<dynamic> filteredData =
+            data.where((e) => e["category"].toString() == "mkulima").toList();
+        loading = false;
+      }
+    } catch (e) {
+      loading = false;
+    }
+    return filteredData;
+  }
+
+  Future<List> getData() async {
+    List<dynamic> filteredData = [];
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    if (prefs.getString("getting_started") == null) {
+      fetchFarmings().then((data) {
+        setState(() {
+          establishment = data;
+        });
+      });
+    } else {
+      setState(() {
+        loading = true;
+      });
+      String storedData = prefs.getString("getting_started").toString();
+      Map<String, dynamic> map = json.decode(storedData);
       List<dynamic> data = map["data"];
 
       //filter before returning data.
-      List<dynamic> filteredData =
+      filteredData =
           data.where((e) => e["category"].toString() == "mkulima").toList();
-      loading = false;
-      return filteredData;
+      setState(() {
+        loading = false;
+      });
     }
+    return filteredData;
   }
 
   void moreDetails(int index, BuildContext context) {
@@ -123,9 +163,55 @@ class _GettingStartedPageState extends State<GettingStartedPage> {
             text: description,
             title: title,
             url: imgUrl,
+            internetCheck: internetCheck,
           );
         },
       ),
     );
+  }
+
+  confirmInternet(BuildContext context) async {
+    await networkCheck();
+    Navigator.of(context).pop();
+  }
+
+  networkCheck() async {
+    NetworkCheck networkCheck = new NetworkCheck();
+    bool check = await networkCheck.check();
+
+    _networkconnectionChange(check);
+  }
+
+  void _networkconnectionChange(bool internet) {
+    setState(() {
+      internetCheck = internet;
+    });
+  }
+
+  showNetworkError(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (_) {
+          return AlertDialog(
+            title: Text("Connectivity Error"),
+            content: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Please check your internet connection and try again"),
+                  RoundedButton(
+                    text: "CANCEL",
+                    sizeval: 0.7,
+                    color: kPrimaryColor,
+                    press: () {
+                      //navigateToDashBoard(context);
+                      confirmInternet(context);
+                    },
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
   }
 }

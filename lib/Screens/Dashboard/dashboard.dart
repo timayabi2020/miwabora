@@ -134,6 +134,13 @@ class _DashboardState extends State<Dashboard> {
     _DiseaseItem('assets/images/ic_pest_foreground.png', 'Weeds'),
     _DiseaseItem('assets/images/ic_cam_cam.png', 'Disease Diagnosis'),
   ];
+
+  List farmList = [
+    _FarmItem('assets/images/ic_year_foreground.png', 'Farm Records & C.B.A'),
+    _FarmItem('assets/images/ic_year_foreground.png',
+        'Farm Records & C.B.A Templates'),
+  ];
+
   shareSocialMedia(BuildContext context, TargetPlatform platform) {
     String text = PLAYSTORELINK;
     if (platform == TargetPlatform.iOS) {
@@ -760,7 +767,7 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  void farmRecordsOptions(BuildContext context, Size size) {
+  /*void farmRecordsOptions(BuildContext context, Size size) {
     showDialog(
         context: context,
         builder: (_) {
@@ -839,7 +846,7 @@ class _DashboardState extends State<Dashboard> {
             ),
           );
         });
-  }
+  }*/
 
   void diseasesOptions(BuildContext context, Size size) {
     showDialog(
@@ -847,54 +854,129 @@ class _DashboardState extends State<Dashboard> {
         builder: (_) {
           return AlertDialog(
               title: Text("Select below"),
-              content: Container(
-                //width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height / 2,
-                //padding: EdgeInsets.all(10),
-                color: Colors.white,
-                child: GridView.builder(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2),
-                  itemBuilder: (context, position) {
-                    return GestureDetector(
-                        onTap: () {
-                          diseaseTap(context, position);
-                        },
-                        child: Container(
-                          height: 100,
-                          child: Card(
-                            semanticContainer: true,
-                            elevation: 5,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Image.asset(
-                                  diseaseList[position].icon.toString(),
-                                  height: 50,
-                                ),
-                                Align(
-                                    alignment: Alignment.bottomCenter,
-                                    child: Column(
-                                      children: [
-                                        TextButton(
-                                          child: Text(
-                                              diseaseList[position].title,
-                                              style: TextStyle(
-                                                  color: kPrimaryColor)),
-                                          onPressed: () {
-                                            diseaseTap(context, position);
-                                          },
-                                        ),
-                                      ],
-                                    )),
-                              ],
+              content: Column(mainAxisSize: MainAxisSize.min, children: [
+                Container(
+                  //width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height / 3,
+                  //padding: EdgeInsets.all(10),
+                  color: Colors.white,
+                  child: GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2),
+                    itemBuilder: (context, position) {
+                      return GestureDetector(
+                          onTap: () {
+                            diseaseTap(context, position);
+                          },
+                          child: Container(
+                            height: 100,
+                            child: Card(
+                              semanticContainer: true,
+                              elevation: 5,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Image.asset(
+                                    diseaseList[position].icon.toString(),
+                                    height: 50,
+                                  ),
+                                  Align(
+                                      alignment: Alignment.bottomCenter,
+                                      child: Column(
+                                        children: [
+                                          TextButton(
+                                            child: Text(
+                                                diseaseList[position].title,
+                                                style: TextStyle(
+                                                    color: kPrimaryColor,
+                                                    fontSize: 11)),
+                                            onPressed: () {
+                                              diseaseTap(context, position);
+                                            },
+                                          ),
+                                        ],
+                                      )),
+                                ],
+                              ),
                             ),
-                          ),
-                        ));
-                  },
-                  itemCount: diseaseList.length,
+                          ));
+                    },
+                    itemCount: diseaseList.length,
+                  ),
                 ),
-              ));
+                ResetPassword(
+                  press: () {
+                    Navigator.of(context).pop();
+                  },
+                  text: 'Cancel',
+                )
+              ]));
+        });
+  }
+
+  void farmRecordsOptions(BuildContext context, Size size) {
+    showDialog(
+        context: context,
+        builder: (_) {
+          return AlertDialog(
+              title: Text("Select below"),
+              content: Column(mainAxisSize: MainAxisSize.min, children: [
+                Container(
+                  //width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height / 4,
+                  //padding: EdgeInsets.all(10),
+                  color: Colors.white,
+                  child: GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2),
+                    itemBuilder: (context, position) {
+                      return GestureDetector(
+                          onTap: () {
+                            farmTap(context, position);
+                          },
+                          child: Container(
+                            height: 400,
+                            child: Card(
+                              // semanticContainer: true,
+                              elevation: 5,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Image.asset(
+                                    farmList[position].icon.toString(),
+                                    height: 50,
+                                  ),
+                                  Align(
+                                      alignment: Alignment.bottomCenter,
+                                      child: Column(
+                                        children: [
+                                          TextButton(
+                                            child: Text(
+                                                farmList[position].title,
+                                                style: TextStyle(
+                                                    color: kPrimaryColor,
+                                                    fontSize: 11)),
+                                            onPressed: () {
+                                              farmTap(context, position);
+                                            },
+                                          ),
+                                        ],
+                                      )),
+                                ],
+                              ),
+                            ),
+                          ));
+                    },
+                    itemCount: farmList.length,
+                  ),
+                ),
+                ResetPassword(
+                  press: () {
+                    Navigator.of(context).pop();
+                  },
+                  text: 'Cancel',
+                )
+              ]));
         });
   }
 
@@ -1085,6 +1167,21 @@ class _DashboardState extends State<Dashboard> {
       ),
     );
   }
+
+  void farmTap(BuildContext context, int position) {
+    if (position == 0) {
+      this.goToCBA(context);
+    } else {
+      this.goToTemplates(context);
+    }
+  }
+}
+
+class _FarmItem {
+  final String icon;
+  final String title;
+
+  _FarmItem(this.icon, this.title);
 }
 
 class _DiseaseItem {

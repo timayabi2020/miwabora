@@ -283,7 +283,7 @@ class _UpdateOtherRegistrationPageState
                                 padding: EdgeInsets.only(
                                     left: size.width * 0.10,
                                     right: size.width * 0.10),
-                                child: DropdownButton(
+                                child: DropdownButtonFormField(
                                   isExpanded: true,
                                   iconSize: 30.0,
                                   style: TextStyle(color: Colors.black),

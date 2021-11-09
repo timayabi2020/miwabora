@@ -4,9 +4,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/io_client.dart';
 import 'package:miwabora/Config/config.dart';
+import 'package:miwabora/Network/network.dart';
 import 'package:miwabora/Screens/Mkulima/common_description.dart';
 import 'package:miwabora/Screens/Mkulima/common_disease_description.dart';
+import 'package:miwabora/components/rounded_button.dart';
 import 'package:miwabora/constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class BrandsPage extends StatefulWidget {
   const BrandsPage({Key? key}) : super(key: key);
@@ -19,9 +22,11 @@ class _BrandsPage extends State<BrandsPage> {
   List establishment = [];
   List searchList = [];
   bool loading = true;
+  bool internetCheck = false;
   @override
   void initState() {
-    fetchFarmings().then((data) {
+    networkCheck();
+    getData().then((data) {
       setState(() {
         establishment = data;
         searchList = data;
@@ -70,11 +75,13 @@ class _BrandsPage extends State<BrandsPage> {
                 ),
                 color: Colors.white,
                 onPressed: () => {
-                  fetchFarmings().then((data) {
-                    setState(() {
-                      establishment = data;
-                    });
-                  })
+                  this.internetCheck
+                      ? showNetworkError(context)
+                      : fetchFarmings().then((data) {
+                          setState(() {
+                            establishment = data;
+                          });
+                        })
                 },
               )
             ]),
@@ -117,10 +124,10 @@ class _BrandsPage extends State<BrandsPage> {
                                 Container(
                                   padding:
                                       EdgeInsets.only(left: size.width * 0.05),
-                                  child: searchList[index]['photo'] == null
+                                  child: this.internetCheck
                                       ? Image.asset(
-                                          "assets/images/ic_farm_demo_foreground",
-                                          width: 250,
+                                          "assets/images/Sugar-brands.png",
+                                          width: 100,
                                         )
                                       : Image.network(
                                           "${searchList[index]['photo']['url']}",
@@ -180,24 +187,59 @@ class _BrandsPage extends State<BrandsPage> {
 
   Future fetchFarmings() async {
     loading = true;
-    final ioc = new HttpClient();
-    ioc.badCertificateCallback =
-        (X509Certificate cert, String host, int port) => true;
-    final http = new IOClient(ioc);
-    var res =
-        await http.get(Uri.parse(SUGARCANEBRANDS), headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-      //'Authorization': 'AppBearer ' + token,
-    });
-    if (res.statusCode == 200) {
-      //var obj = json.decode(res.body);
-      Map<String, dynamic> map = json.decode(res.body);
+    List<dynamic> data = [];
+    try {
+      final ioc = new HttpClient();
+      ioc.badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+      final http = new IOClient(ioc);
+      var res =
+          await http.get(Uri.parse(SUGARCANEBRANDS), headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        //'Authorization': 'AppBearer ' + token,
+      });
+      if (res.statusCode == 200) {
+        //var obj = json.decode(res.body);
+        Map<String, dynamic> map = json.decode(res.body);
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString("brands", res.body);
+        data = map["data"];
+
+        //filter before returning data.
+        loading = false;
+        setState(() {
+          establishment = data;
+        });
+      }
+    } catch (e) {}
+    return data;
+  }
+
+  Future<List> getData() async {
+    List<dynamic> filteredData = [];
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    if (prefs.getString("brands") == null) {
+      fetchFarmings().then((data) {
+        setState(() {
+          establishment = data;
+        });
+      });
+    } else {
+      setState(() {
+        loading = true;
+      });
+      String storedData = prefs.getString("brands").toString();
+      Map<String, dynamic> map = json.decode(storedData);
       List<dynamic> data = map["data"];
 
       //filter before returning data.
-      loading = false;
-      return data;
+      filteredData = data;
+      setState(() {
+        loading = false;
+      });
     }
+    return filteredData;
   }
 
   void moreDetails(int index, BuildContext context) {
@@ -215,9 +257,55 @@ class _BrandsPage extends State<BrandsPage> {
             title: title,
             url: imgUrl,
             management: management,
+            internetCheck: this.internetCheck,
           );
         },
       ),
     );
+  }
+
+  confirmInternet(BuildContext context) async {
+    await networkCheck();
+    Navigator.of(context).pop();
+  }
+
+  networkCheck() async {
+    NetworkCheck networkCheck = new NetworkCheck();
+    bool check = await networkCheck.check();
+
+    _networkconnectionChange(check);
+  }
+
+  void _networkconnectionChange(bool internet) {
+    setState(() {
+      internetCheck = internet;
+    });
+  }
+
+  showNetworkError(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (_) {
+          return AlertDialog(
+            title: Text("Connectivity Error"),
+            content: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Please check your internet connection and try again"),
+                  RoundedButton(
+                    text: "CANCEL",
+                    sizeval: 0.7,
+                    color: kPrimaryColor,
+                    press: () {
+                      //navigateToDashBoard(context);
+                      confirmInternet(context);
+                    },
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
   }
 }

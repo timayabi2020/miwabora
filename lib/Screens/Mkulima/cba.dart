@@ -4,7 +4,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/io_client.dart';
 import 'package:miwabora/Config/config.dart';
+import 'package:miwabora/Network/network.dart';
 import 'package:miwabora/Screens/Mkulima/common_description.dart';
+import 'package:miwabora/components/rounded_button.dart';
 import 'package:miwabora/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -18,8 +20,10 @@ class CBAPage extends StatefulWidget {
 class _CBAPageState extends State<CBAPage> {
   List establishment = [];
   bool loading = true;
+  bool internetCheck = false;
   @override
   void initState() {
+    networkCheck();
     getData().then((data) {
       setState(() {
         establishment = data;
@@ -51,11 +55,13 @@ class _CBAPageState extends State<CBAPage> {
                 ),
                 color: Colors.white,
                 onPressed: () => {
-                  fetchFarmings().then((data) {
-                    setState(() {
-                      establishment = data;
-                    });
-                  })
+                  this.internetCheck == false
+                      ? showNetworkError(context)
+                      : fetchFarmings().then((data) {
+                          setState(() {
+                            establishment = data;
+                          });
+                        })
                 },
               )
             ]),
@@ -92,10 +98,10 @@ class _CBAPageState extends State<CBAPage> {
                                 Container(
                                   padding:
                                       EdgeInsets.only(left: size.width * 0.05),
-                                  child: establishment.length == 0
+                                  child: this.internetCheck == false
                                       ? Image.asset(
-                                          "assets/images/ic_farm_demo_foreground",
-                                          width: 250,
+                                          "assets/images/Yearbooks.png",
+                                          width: 100,
                                         )
                                       : Image.network(
                                           "${establishment[index]['picture'][0]['url']}",
@@ -136,28 +142,36 @@ class _CBAPageState extends State<CBAPage> {
 
   Future fetchFarmings() async {
     loading = true;
-    final ioc = new HttpClient();
-    ioc.badCertificateCallback =
-        (X509Certificate cert, String host, int port) => true;
-    final http = new IOClient(ioc);
-    var res = await http
-        .get(Uri.parse(SUGARCANE_ESTABLISHMENT), headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-      //'Authorization': 'AppBearer ' + token,
-    });
-    if (res.statusCode == 200) {
-      //var obj = json.decode(res.body);
-      Map<String, dynamic> map = json.decode(res.body);
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setString("cba", res.body);
-      List<dynamic> data = map["data"];
+    List<dynamic> filteredData = [];
+    try {
+      final ioc = new HttpClient();
+      ioc.badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+      final http = new IOClient(ioc);
+      var res = await http
+          .get(Uri.parse(SUGARCANE_ESTABLISHMENT), headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        //'Authorization': 'AppBearer ' + token,
+      });
+      if (res.statusCode == 200) {
+        //var obj = json.decode(res.body);
+        Map<String, dynamic> map = json.decode(res.body);
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString("cba", res.body);
+        List<dynamic> data = map["data"];
 
-      //filter before returning data.
-      List<dynamic> filteredData =
-          data.where((e) => e["category"].toString() == "farm").toList();
+        //filter before returning data.
+        List<dynamic> filteredData =
+            data.where((e) => e["category"].toString() == "farm").toList();
+        loading = false;
+        setState(() {
+          establishment = filteredData;
+        });
+      }
+    } catch (e) {
       loading = false;
-      return filteredData;
     }
+    return filteredData;
   }
 
   Future<List> getData() async {
@@ -201,9 +215,55 @@ class _CBAPageState extends State<CBAPage> {
             text: description,
             title: title,
             url: imgUrl,
+            internetCheck: this.internetCheck,
           );
         },
       ),
     );
+  }
+
+  confirmInternet(BuildContext context) async {
+    await networkCheck();
+    Navigator.of(context).pop();
+  }
+
+  networkCheck() async {
+    NetworkCheck networkCheck = new NetworkCheck();
+    bool check = await networkCheck.check();
+
+    _networkconnectionChange(check);
+  }
+
+  void _networkconnectionChange(bool internet) {
+    setState(() {
+      internetCheck = internet;
+    });
+  }
+
+  showNetworkError(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (_) {
+          return AlertDialog(
+            title: Text("Connectivity Error"),
+            content: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Please check your internet connection and try again"),
+                  RoundedButton(
+                    text: "CANCEL",
+                    sizeval: 0.7,
+                    color: kPrimaryColor,
+                    press: () {
+                      //navigateToDashBoard(context);
+                      confirmInternet(context);
+                    },
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
   }
 }

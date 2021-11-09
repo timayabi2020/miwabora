@@ -321,6 +321,9 @@ class _OfficersPageState extends State<OfficersPage> {
           .where((e) => e["company"]["id"].toString() == _miller_id.toString())
           .toList();
       loading = false;
+      setState(() {
+        establishment = filteredData;
+      });
       return filteredData;
     }
   }

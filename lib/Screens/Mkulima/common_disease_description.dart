@@ -6,8 +6,14 @@ class MkulimaDiseaseDescriptionPage extends StatelessWidget {
   final String? url;
   final String? title;
   final String? management;
+  final bool? internetCheck;
   const MkulimaDiseaseDescriptionPage(
-      {Key? key, this.text, this.url, this.title, this.management})
+      {Key? key,
+      this.text,
+      this.url,
+      this.title,
+      this.management,
+      this.internetCheck})
       : super(key: key);
 
   @override
@@ -25,12 +31,17 @@ class MkulimaDiseaseDescriptionPage extends StatelessWidget {
             child: Column(
           children: [
             Container(
-                child: Image.network(
-              url.toString(),
-              width: size.width,
-              height: 200,
-              fit: BoxFit.cover,
-            )),
+                child: internetCheck == false
+                    ? Image.asset(
+                        "assets/images/logobora.png",
+                        width: 250,
+                      )
+                    : Image.network(
+                        url.toString(),
+                        width: size.width,
+                        height: 200,
+                        fit: BoxFit.cover,
+                      )),
             Card(
                 color: Colors.white,
                 // color: Color.fromRGBO(138, 170, 243, 0.5),

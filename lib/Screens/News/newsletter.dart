@@ -4,9 +4,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/io_client.dart';
 import 'package:miwabora/Config/config.dart';
+import 'package:miwabora/Network/network.dart';
 import 'package:miwabora/Screens/Mkulima/common_description.dart';
 import 'package:miwabora/Screens/News/openpdf.dart';
+import 'package:miwabora/components/rounded_button.dart';
 import 'package:miwabora/constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NewsPage extends StatefulWidget {
   const NewsPage({Key? key}) : super(key: key);
@@ -18,9 +21,11 @@ class NewsPage extends StatefulWidget {
 class _NewsPageState extends State<NewsPage> {
   List establishment = [];
   bool loading = true;
+  bool internetCheck = false;
   @override
   void initState() {
-    fetchFarmings().then((data) {
+    networkCheck();
+    getData().then((data) {
       setState(() {
         establishment = data;
       });
@@ -51,11 +56,13 @@ class _NewsPageState extends State<NewsPage> {
                 ),
                 color: Colors.white,
                 onPressed: () => {
-                  fetchFarmings().then((data) {
-                    setState(() {
-                      establishment = data;
-                    });
-                  })
+                  this.internetCheck == false
+                      ? showNetworkError(context)
+                      : fetchFarmings().then((data) {
+                          setState(() {
+                            establishment = data;
+                          });
+                        })
                 },
               )
             ]),
@@ -92,9 +99,9 @@ class _NewsPageState extends State<NewsPage> {
                                 Container(
                                   padding:
                                       EdgeInsets.only(left: size.width * 0.05),
-                                  child: establishment.length == 0
+                                  child: this.internetCheck == false
                                       ? Image.asset(
-                                          "assets/images/ic_farm_demo_foreground",
+                                          "assets/images/ic_news_letter_foreground.png",
                                           width: 250,
                                         )
                                       : Image.network(
@@ -137,27 +144,69 @@ class _NewsPageState extends State<NewsPage> {
   Future fetchFarmings() async {
     loading = true;
     final ioc = new HttpClient();
-    ioc.badCertificateCallback =
-        (X509Certificate cert, String host, int port) => true;
-    final http = new IOClient(ioc);
-    var res = await http.get(Uri.parse(PUBLICATIONS), headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-      //'Authorization': 'AppBearer ' + token,
-    });
-    if (res.statusCode == 200) {
-      //var obj = json.decode(res.body);
-      Map<String, dynamic> map = json.decode(res.body);
+    List<dynamic> filteredData = [];
+    try {
+      ioc.badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+      final http = new IOClient(ioc);
+      var res =
+          await http.get(Uri.parse(PUBLICATIONS), headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        //'Authorization': 'AppBearer ' + token,
+      });
+      if (res.statusCode == 200) {
+        //var obj = json.decode(res.body);
+        Map<String, dynamic> map = json.decode(res.body);
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString("news", res.body);
+        List<dynamic> data = map["data"];
+
+        //filter before returning data.
+        List<dynamic> filteredData = data
+            .where((e) =>
+                e["type"].toString() == "newsLetter" &&
+                !e["file"]["file_name"].toString().endsWith("..pdf"))
+            .toList();
+        loading = false;
+        setState(() {
+          establishment = filteredData;
+        });
+      }
+    } catch (e) {
+      loading = false;
+    }
+    return filteredData;
+  }
+
+  Future<List> getData() async {
+    List<dynamic> filteredData = [];
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    if (prefs.getString("news") == null) {
+      fetchFarmings().then((data) {
+        setState(() {
+          establishment = data;
+        });
+      });
+    } else {
+      setState(() {
+        loading = true;
+      });
+      String storedData = prefs.getString("news").toString();
+      Map<String, dynamic> map = json.decode(storedData);
       List<dynamic> data = map["data"];
 
       //filter before returning data.
-      List<dynamic> filteredData = data
+      filteredData = data
           .where((e) =>
               e["type"].toString() == "newsLetter" &&
               !e["file"]["file_name"].toString().endsWith("..pdf"))
           .toList();
-      loading = false;
-      return filteredData;
+      setState(() {
+        loading = false;
+      });
     }
+    return filteredData;
   }
 
   void moreDetails(int index, BuildContext context) {
@@ -175,18 +224,64 @@ class _NewsPageState extends State<NewsPage> {
         "/" +
         name;
     print(fileName);
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) {
-          return PdfViewer(
-            url: fileName,
-            title: title,
-            filename: name,
+    this.internetCheck == false
+        ? showNetworkError(context)
+        : Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) {
+                return PdfViewer(
+                  url: fileName,
+                  title: title,
+                  filename: name,
+                );
+              },
+            ),
           );
-        },
-      ),
-    );
+  }
+
+  confirmInternet(BuildContext context) async {
+    await networkCheck();
+    Navigator.of(context).pop();
+  }
+
+  networkCheck() async {
+    NetworkCheck networkCheck = new NetworkCheck();
+    bool check = await networkCheck.check();
+
+    _networkconnectionChange(check);
+  }
+
+  void _networkconnectionChange(bool internet) {
+    setState(() {
+      internetCheck = internet;
+    });
+  }
+
+  showNetworkError(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (_) {
+          return AlertDialog(
+            title: Text("Connectivity Error"),
+            content: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Please check your internet connection and try again"),
+                  RoundedButton(
+                    text: "CANCEL",
+                    sizeval: 0.7,
+                    color: kPrimaryColor,
+                    press: () {
+                      //navigateToDashBoard(context);
+                      confirmInternet(context);
+                    },
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
   }
 }

@@ -9,6 +9,7 @@ class ProductionDescriptionPage extends StatelessWidget {
   final String? plant_crop;
   final String? ratoon_crop;
   final String? title;
+  final bool? internetCheck;
   const ProductionDescriptionPage(
       {Key? key,
       this.activity,
@@ -17,7 +18,8 @@ class ProductionDescriptionPage extends StatelessWidget {
       this.unit_cost,
       this.plant_crop,
       this.ratoon_crop,
-      this.title})
+      this.title,
+      this.internetCheck})
       : super(key: key);
 
   @override

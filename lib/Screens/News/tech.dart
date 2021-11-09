@@ -4,8 +4,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/io_client.dart';
 import 'package:miwabora/Config/config.dart';
+import 'package:miwabora/Network/network.dart';
 import 'package:miwabora/Screens/Mkulima/common_description.dart';
+import 'package:miwabora/components/rounded_button.dart';
 import 'package:miwabora/constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TechnologyPage extends StatefulWidget {
   const TechnologyPage({Key? key}) : super(key: key);
@@ -18,9 +21,11 @@ class _TechnologyPage extends State<TechnologyPage> {
   List establishment = [];
   List searchList = [];
   bool loading = true;
+  bool internetCheck = false;
   @override
   void initState() {
-    fetchFarmings().then((data) {
+    networkCheck();
+    getData().then((data) {
       setState(() {
         establishment = data;
         searchList = data;
@@ -69,11 +74,13 @@ class _TechnologyPage extends State<TechnologyPage> {
                 ),
                 color: Colors.white,
                 onPressed: () => {
-                  fetchFarmings().then((data) {
-                    setState(() {
-                      establishment = data;
-                    });
-                  })
+                  this.internetCheck == false
+                      ? showNetworkError(context)
+                      : fetchFarmings().then((data) {
+                          setState(() {
+                            establishment = data;
+                          });
+                        })
                 },
               )
             ]),
@@ -116,10 +123,10 @@ class _TechnologyPage extends State<TechnologyPage> {
                                 Container(
                                   padding:
                                       EdgeInsets.only(left: size.width * 0.05),
-                                  child: establishment.length == 0
+                                  child: this.internetCheck == false
                                       ? Image.asset(
-                                          "assets/images/ic_farm_demo_foreground",
-                                          width: 250,
+                                          "assets/images/Technologies-&-Innovations.png",
+                                          width: 100,
                                         )
                                       : Image.network(
                                           "${searchList[index]['photo']['url']}",
@@ -131,15 +138,13 @@ class _TechnologyPage extends State<TechnologyPage> {
                                 const SizedBox(width: 8),
                                 Flexible(
                                   child: Container(
-                                    child: establishment.length == 0
-                                        ? Text("Loading data...")
-                                        : Text(
-                                            "${searchList[index]['name']}",
-                                            maxLines: 15,
-                                            style: TextStyle(
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.bold),
-                                          ),
+                                    child: Text(
+                                      "${searchList[index]['name']}",
+                                      maxLines: 15,
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold),
+                                    ),
                                   ),
                                 ),
                               ]))));
@@ -160,26 +165,65 @@ class _TechnologyPage extends State<TechnologyPage> {
 
   Future fetchFarmings() async {
     loading = true;
-    final ioc = new HttpClient();
-    ioc.badCertificateCallback =
-        (X509Certificate cert, String host, int port) => true;
-    final http = new IOClient(ioc);
-    var res =
-        await http.get(Uri.parse(VALUEADDITION), headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-      //'Authorization': 'AppBearer ' + token,
-    });
-    if (res.statusCode == 200) {
-      //var obj = json.decode(res.body);
-      Map<String, dynamic> map = json.decode(res.body);
+    List<dynamic> filteredData = [];
+    try {
+      final ioc = new HttpClient();
+      ioc.badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+      final http = new IOClient(ioc);
+      var res =
+          await http.get(Uri.parse(VALUEADDITION), headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        //'Authorization': 'AppBearer ' + token,
+      });
+      if (res.statusCode == 200) {
+        //var obj = json.decode(res.body);
+        Map<String, dynamic> map = json.decode(res.body);
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString("tech", res.body);
+        List<dynamic> data = map["data"];
+
+        //filter before returning data.
+        List<dynamic> filteredData =
+            data.where((e) => e["category"] == "Technologies").toList();
+        loading = false;
+        setState(() {
+          establishment = filteredData;
+        });
+      }
+    } catch (e) {
+      loading = false;
+    }
+    return filteredData;
+  }
+
+  Future<List> getData() async {
+    List<dynamic> filteredData = [];
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    if (prefs.getString("tech") == null) {
+      fetchFarmings().then((data) {
+        setState(() {
+          establishment = data;
+        });
+      });
+    } else {
+      setState(() {
+        loading = true;
+      });
+      String storedData = prefs.getString("tech").toString();
+      Map<String, dynamic> map = json.decode(storedData);
       List<dynamic> data = map["data"];
 
       //filter before returning data.
-      List<dynamic> filteredData =
-          data.where((e) => e["category"] == "Technologies").toList();
-      loading = false;
-      return filteredData;
+      filteredData = data
+          .where((e) => e["category"].toString() == "Technologies")
+          .toList();
+      setState(() {
+        loading = false;
+      });
     }
+    return filteredData;
   }
 
   void moreDetails(int index, BuildContext context) {
@@ -195,9 +239,55 @@ class _TechnologyPage extends State<TechnologyPage> {
             text: description,
             title: title,
             url: imgUrl,
+            internetCheck: this.internetCheck,
           );
         },
       ),
     );
+  }
+
+  confirmInternet(BuildContext context) async {
+    await networkCheck();
+    Navigator.of(context).pop();
+  }
+
+  networkCheck() async {
+    NetworkCheck networkCheck = new NetworkCheck();
+    bool check = await networkCheck.check();
+
+    _networkconnectionChange(check);
+  }
+
+  void _networkconnectionChange(bool internet) {
+    setState(() {
+      internetCheck = internet;
+    });
+  }
+
+  showNetworkError(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (_) {
+          return AlertDialog(
+            title: Text("Connectivity Error"),
+            content: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Please check your internet connection and try again"),
+                  RoundedButton(
+                    text: "CANCEL",
+                    sizeval: 0.7,
+                    color: kPrimaryColor,
+                    press: () {
+                      //navigateToDashBoard(context);
+                      confirmInternet(context);
+                    },
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
   }
 }
