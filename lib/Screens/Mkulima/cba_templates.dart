@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:http/io_client.dart';
 import 'package:miwabora/Config/config.dart';
 import 'package:miwabora/Screens/Mkulima/common_description.dart';
+import 'package:miwabora/Screens/News/openpdf.dart';
 import 'package:miwabora/constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CBATemplatePage extends StatefulWidget {
   const CBATemplatePage({Key? key}) : super(key: key);
@@ -19,7 +21,7 @@ class _CBATemplatePageState extends State<CBATemplatePage> {
   bool loading = true;
   @override
   void initState() {
-    fetchFarmings().then((data) {
+    getData().then((data) {
       setState(() {
         establishment = data;
       });
@@ -32,24 +34,19 @@ class _CBATemplatePageState extends State<CBATemplatePage> {
     return Stack(children: [
       Scaffold(
         appBar: AppBar(
-          title: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-            Container(
-                //padding: EdgeInsets.only(left: size.width * 0.05),
-                //alignment: Alignment.centerLeft,
-                child: Flexible(
-              child: Text("Farm Record Templates",
-                  maxLines: 20,
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold)),
-            )),
+            title: Row(children: [
+              Flexible(
+                child: Text("Farm Record Templates",
+                    maxLines: 20,
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold)),
+              )
+            ]),
             //SizedBox(width: size.width * 0.03),
-            Container(
-              // padding: EdgeInsets.only(left: size.width * 0.20),
-              // alignment: Alignment.topRight,
-
-              child: IconButton(
+            actions: <Widget>[
+              IconButton(
                 icon: Icon(
                   Icons.refresh,
                   //size: 40,
@@ -62,11 +59,8 @@ class _CBATemplatePageState extends State<CBATemplatePage> {
                     });
                   })
                 },
-              ),
-            )
-          ]),
-          backgroundColor: kPrimaryColor,
-        ),
+              )
+            ]),
         body: SingleChildScrollView(
           child: Row(children: [
             Expanded(
@@ -88,7 +82,7 @@ class _CBATemplatePageState extends State<CBATemplatePage> {
                       return GestureDetector(
                           onTap: () {
                             // doPayment(position, context);
-                            // moreDetails(index, context);
+                            moreDetails(index, context);
                           },
                           child: Card(
                               color: Colors.white,
@@ -155,6 +149,8 @@ class _CBATemplatePageState extends State<CBATemplatePage> {
     if (res.statusCode == 200) {
       //var obj = json.decode(res.body);
       Map<String, dynamic> map = json.decode(res.body);
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString("templates", res.body);
       List<dynamic> data = map["data"];
 
       //filter before returning data.
@@ -165,23 +161,60 @@ class _CBATemplatePageState extends State<CBATemplatePage> {
     }
   }
 
+  Future<List> getData() async {
+    List<dynamic> filteredData = [];
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    if (prefs.getString("templates") == null) {
+      fetchFarmings().then((data) {
+        setState(() {
+          establishment = data;
+        });
+      });
+    } else {
+      setState(() {
+        loading = true;
+      });
+      String storedData = prefs.getString("templates").toString();
+      Map<String, dynamic> map = json.decode(storedData);
+      List<dynamic> data = map["data"];
+
+      //filter before returning data.
+      filteredData = data.where((e) => e["type"].toString() == "farm").toList();
+      setState(() {
+        loading = false;
+      });
+    }
+    return filteredData;
+  }
+
   void moreDetails(int index, BuildContext context) {
     String description = establishment[index]["overview"];
     String title = establishment[index]["title"];
-    String imgUrl = establishment[index]['snapshot']['url'];
-    String fileName = ROOT + "/" + establishment[index]["file"]["filename"];
+    //String imgUrl = establishment[index]['snapshot']['url'];
+    String name = establishment[index]["file"]["file_name"].toString();
+    if (name.contains("..pdf")) {
+      name = name.replaceAll("..pdf", ".pdf");
+    }
+    print("Extracted name " + name);
+    String fileName = FILE_ROOT +
+        "/storage/app/public/" +
+        establishment[index]["file"]["id"].toString() +
+        "/" +
+        name;
+    print(fileName);
 
-    /*Navigator.push(
+    Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) {
-          return MkulimaDescriptionPage(
-            text: description,
+          return PdfViewer(
+            url: fileName,
             title: title,
-            url: imgUrl,
+            filename: name,
           );
         },
       ),
-    );*/
+    );
   }
 }

@@ -6,6 +6,7 @@ import 'package:http/io_client.dart';
 import 'package:miwabora/Config/config.dart';
 import 'package:miwabora/Screens/Mkulima/common_description.dart';
 import 'package:miwabora/constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProductionEnvironmentPage extends StatefulWidget {
   const ProductionEnvironmentPage({Key? key}) : super(key: key);
@@ -19,7 +20,7 @@ class _ProductionEnvironmentPage extends State<ProductionEnvironmentPage> {
   bool loading = true;
   @override
   void initState() {
-    fetchFarmings().then((data) {
+    getData().then((data) {
       setState(() {
         establishment = data;
       });
@@ -32,22 +33,17 @@ class _ProductionEnvironmentPage extends State<ProductionEnvironmentPage> {
     return Stack(children: [
       Scaffold(
         appBar: AppBar(
-          title: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-            Container(
-              //padding: EdgeInsets.only(left: size.width * 0.05),
-              //alignment: Alignment.centerLeft,
-              child: Text("Production Environment",
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold)),
-            ),
-            SizedBox(width: size.width * 0.03),
-            Container(
-              // padding: EdgeInsets.only(left: size.width * 0.20),
-              // alignment: Alignment.topRight,
-
-              child: IconButton(
+            title: Row(children: [
+              Flexible(
+                child: Text("Production Environment",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold)),
+              )
+            ]),
+            actions: <Widget>[
+              IconButton(
                 icon: Icon(
                   Icons.refresh,
                   //size: 40,
@@ -60,11 +56,8 @@ class _ProductionEnvironmentPage extends State<ProductionEnvironmentPage> {
                     });
                   })
                 },
-              ),
-            )
-          ]),
-          backgroundColor: kPrimaryColor,
-        ),
+              )
+            ]),
         body: SingleChildScrollView(
           child: Row(children: [
             Expanded(
@@ -154,14 +147,47 @@ class _ProductionEnvironmentPage extends State<ProductionEnvironmentPage> {
     if (res.statusCode == 200) {
       //var obj = json.decode(res.body);
       Map<String, dynamic> map = json.decode(res.body);
+      //Store in shared preferences firs
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString("production_environment", res.body);
       List<dynamic> data = map["data"];
 
       //filter before returning data.
       List<dynamic> filteredData =
           data.where((e) => e["category"].toString() == "production").toList();
       loading = false;
+
       return filteredData;
     }
+  }
+
+  Future<List> getData() async {
+    List<dynamic> filteredData = [];
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    if (prefs.getString("production_environment") == null) {
+      fetchFarmings().then((data) {
+        setState(() {
+          establishment = data;
+        });
+      });
+
+      setState(() {
+        loading = true;
+      });
+    } else {
+      String storedData = prefs.getString("production_environment").toString();
+      Map<String, dynamic> map = json.decode(storedData);
+      List<dynamic> data = map["data"];
+
+      //filter before returning data.
+      filteredData =
+          data.where((e) => e["category"].toString() == "production").toList();
+      setState(() {
+        loading = false;
+      });
+    }
+    return filteredData;
   }
 
   void moreDetails(int index, BuildContext context) {

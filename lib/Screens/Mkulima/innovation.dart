@@ -6,6 +6,7 @@ import 'package:http/io_client.dart';
 import 'package:miwabora/Config/config.dart';
 import 'package:miwabora/Screens/Mkulima/common_description.dart';
 import 'package:miwabora/constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class InnovationPage extends StatefulWidget {
   const InnovationPage({Key? key}) : super(key: key);
@@ -19,7 +20,7 @@ class _InnovationPageState extends State<InnovationPage> {
   bool loading = true;
   @override
   void initState() {
-    fetchFarmings().then((data) {
+    getData().then((data) {
       setState(() {
         establishment = data;
       });
@@ -32,24 +33,18 @@ class _InnovationPageState extends State<InnovationPage> {
     return Stack(children: [
       Scaffold(
         appBar: AppBar(
-          title: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-            Container(
-                //padding: EdgeInsets.only(left: size.width * 0.05),
-                //alignment: Alignment.centerLeft,
-                child: Flexible(
-              child: Text("Extension & Innovation Promotion",
-                  maxLines: 15,
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold)),
-            )),
-            SizedBox(width: size.width * 0.03),
-            Container(
-              // padding: EdgeInsets.only(left: size.width * 0.20),
-              // alignment: Alignment.topRight,
-
-              child: IconButton(
+            title: Row(children: [
+              Flexible(
+                child: Text("Extension & Innovation Promotion",
+                    maxLines: 15,
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold)),
+              )
+            ]),
+            actions: <Widget>[
+              IconButton(
                 icon: Icon(
                   Icons.refresh,
                   //size: 40,
@@ -62,11 +57,8 @@ class _InnovationPageState extends State<InnovationPage> {
                     });
                   })
                 },
-              ),
-            )
-          ]),
-          backgroundColor: kPrimaryColor,
-        ),
+              )
+            ]),
         body: SingleChildScrollView(
           child: Row(children: [
             Expanded(
@@ -156,6 +148,8 @@ class _InnovationPageState extends State<InnovationPage> {
     if (res.statusCode == 200) {
       //var obj = json.decode(res.body);
       Map<String, dynamic> map = json.decode(res.body);
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString("innovation", res.body);
       List<dynamic> data = map["data"];
 
       //filter before returning data.
@@ -164,6 +158,34 @@ class _InnovationPageState extends State<InnovationPage> {
       loading = false;
       return filteredData;
     }
+  }
+
+  Future<List> getData() async {
+    List<dynamic> filteredData = [];
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    if (prefs.getString("innovation") == null) {
+      fetchFarmings().then((data) {
+        setState(() {
+          establishment = data;
+        });
+      });
+    } else {
+      setState(() {
+        loading = true;
+      });
+      String storedData = prefs.getString("innovation").toString();
+      Map<String, dynamic> map = json.decode(storedData);
+      List<dynamic> data = map["data"];
+
+      //filter before returning data.
+      filteredData =
+          data.where((e) => e["category"].toString() == "extension").toList();
+      setState(() {
+        loading = false;
+      });
+    }
+    return filteredData;
   }
 
   void moreDetails(int index, BuildContext context) {

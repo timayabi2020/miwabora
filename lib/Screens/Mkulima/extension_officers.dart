@@ -8,6 +8,7 @@ import 'package:miwabora/Config/config.dart';
 import 'package:miwabora/Screens/Mkulima/common_description.dart';
 import 'package:miwabora/constants.dart';
 import 'package:share/share.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class OfficersPage extends StatefulWidget {
@@ -29,7 +30,7 @@ class _OfficersPageState extends State<OfficersPage> {
 
   @override
   void initState() {
-    fetchFarmings().then((data) {
+    getData().then((data) {
       setState(() {
         establishment = data;
       });
@@ -51,24 +52,18 @@ class _OfficersPageState extends State<OfficersPage> {
           resizeToAvoidBottomInset: false,
           backgroundColor: Colors.transparent,
           appBar: AppBar(
-            title: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-              Container(
-                  //padding: EdgeInsets.only(left: size.width * 0.05),
-                  //alignment: Alignment.centerLeft,
-                  child: Flexible(
-                child: Text("Extension Officer",
-                    maxLines: 15,
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold)),
-              )),
-              SizedBox(width: size.width * 0.2),
-              Container(
-                // padding: EdgeInsets.only(left: size.width * 0.20),
-                // alignment: Alignment.topRight,
-
-                child: IconButton(
+              title: Row(children: [
+                Flexible(
+                  child: Text("Extension Officer",
+                      maxLines: 15,
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold)),
+                )
+              ]),
+              actions: <Widget>[
+                IconButton(
                   icon: Icon(
                     Icons.refresh,
                     //size: 40,
@@ -81,11 +76,8 @@ class _OfficersPageState extends State<OfficersPage> {
                       });
                     })
                   },
-                ),
-              )
-            ]),
-            backgroundColor: kPrimaryColor,
-          ),
+                )
+              ]),
           body: SingleChildScrollView(
 
               //constraints: BoxConstraints.expand(),
@@ -218,7 +210,10 @@ class _OfficersPageState extends State<OfficersPage> {
                                         //size: 40,
                                         ),
                                     color: Colors.green,
-                                    onPressed: () => {callOfficer(establishment[0]["contact_phone_1"])},
+                                    onPressed: () => {
+                                      callOfficer(
+                                          establishment[0]["contact_phone_1"])
+                                    },
                                   ),
                           ),
                         ),
@@ -247,7 +242,10 @@ class _OfficersPageState extends State<OfficersPage> {
                                           //size: 40,
                                           ),
                                       color: Colors.green,
-                                      onPressed: () => {callOfficer(establishment[0]["contact_phone_1"])},
+                                      onPressed: () => {
+                                        callOfficer(
+                                            establishment[0]["contact_phone_1"])
+                                      },
                                     )),
                         ),
                       ]),
@@ -314,6 +312,8 @@ class _OfficersPageState extends State<OfficersPage> {
     if (res.statusCode == 200) {
       //var obj = json.decode(res.body);
       Map<String, dynamic> map = json.decode(res.body);
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString("officers", res.body);
       List<dynamic> data = map["data"];
 
       //filter before returning data.
@@ -321,9 +321,37 @@ class _OfficersPageState extends State<OfficersPage> {
           .where((e) => e["company"]["id"].toString() == _miller_id.toString())
           .toList();
       loading = false;
-      print(filteredData[0]["contact_first_name"]);
       return filteredData;
     }
+  }
+
+  Future<List> getData() async {
+    List<dynamic> filteredData = [];
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    if (prefs.getString("officers") == null) {
+      fetchFarmings().then((data) {
+        setState(() {
+          establishment = data;
+        });
+      });
+    } else {
+      setState(() {
+        loading = true;
+      });
+      String storedData = prefs.getString("officers").toString();
+      Map<String, dynamic> map = json.decode(storedData);
+      List<dynamic> data = map["data"];
+
+      //filter before returning data.
+      filteredData = data
+          .where((e) => e["company"]["id"].toString() == _miller_id.toString())
+          .toList();
+      setState(() {
+        loading = false;
+      });
+    }
+    return filteredData;
   }
 
   void moreDetails(int index, BuildContext context) {
@@ -393,18 +421,20 @@ class _OfficersPageState extends State<OfficersPage> {
             '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
         .join('&');
   }
-  Future<void> _launched;
 
-Future<void> _openUrl(String url) async {
+  Future<void>? _launched;
+
+  Future<void> _openUrl(String url) async {
     if (await canLaunch(url)) {
       await launch(url);
     } else {
       throw 'Could not launch $url';
     }
-}
-void callOfficer(String phone){
-  setState(() {
-  _launched = _openUrl('tel:${phone}');
-});
-}
+  }
+
+  void callOfficer(String phone) {
+    setState(() {
+      _launched = _openUrl('tel:${phone}');
+    });
+  }
 }

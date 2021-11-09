@@ -51,24 +51,18 @@ class _ValueAdditionPage extends State<ValueAdditionPage> {
     return Stack(children: [
       Scaffold(
         appBar: AppBar(
-          title: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-            Container(
-                //padding: EdgeInsets.only(left: size.width * 0.05),
-                //alignment: Alignment.centerLeft,
-                child: Flexible(
-              child: Text("Value Addition Opportunities",
-                  maxLines: 15,
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold)),
-            )),
-            SizedBox(width: size.width * 0.03),
-            Container(
-              // padding: EdgeInsets.only(left: size.width * 0.20),
-              // alignment: Alignment.topRight,
-
-              child: IconButton(
+            title: Row(children: [
+              Flexible(
+                child: Text("Value Addition Opportunities",
+                    maxLines: 15,
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold)),
+              )
+            ]),
+            actions: <Widget>[
+              IconButton(
                 icon: Icon(
                   Icons.refresh,
                   //size: 40,
@@ -81,11 +75,8 @@ class _ValueAdditionPage extends State<ValueAdditionPage> {
                     });
                   })
                 },
-              ),
-            )
-          ]),
-          backgroundColor: kPrimaryColor,
-        ),
+              )
+            ]),
         body: SingleChildScrollView(
           child: Row(children: [
             Expanded(

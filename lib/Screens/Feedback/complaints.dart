@@ -15,9 +15,9 @@ class ComplaintsPage extends StatefulWidget {
   String? userId;
   String? username;
   String? email;
-  Map<String, String>? resultsMap;
+  Map<String, dynamic>? resultsMap;
   ComplaintsPage(String userId, String username, String email,
-      Map<String, String> details) {
+      Map<String, dynamic> details) {
     this.userId = userId;
     this.username = username;
     this.email = email;
@@ -30,11 +30,11 @@ class ComplaintsPage extends StatefulWidget {
 }
 
 class _ComplaintsPageState extends State<ComplaintsPage> {
-  Map<String, String>? details;
+  Map<String, dynamic>? details;
   String _user_id = "";
   String _complaint = "";
   String _subject = "";
-  _ComplaintsPageState(String userId, Map<String, String>? resultsMap) {
+  _ComplaintsPageState(String userId, Map<String, dynamic>? resultsMap) {
     this._user_id = userId;
     this.details = resultsMap;
   }

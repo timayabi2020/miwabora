@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:miwabora/Screens/Dashboard/dashboard.dart';
 import 'dart:async';
 
 import 'package:miwabora/Screens/Login/login.dart';
 import 'package:miwabora/constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(MyApp());
@@ -39,8 +43,7 @@ class _SplashScreenState extends State<SplashScreen>
               setState(() {
                 isLoading = false; //set loading to false
               }),
-              Navigator.of(context).pushReplacement(MaterialPageRoute(
-                  builder: (BuildContext context) => LoginPage()))
+              getData()
             });
   }
 
@@ -67,5 +70,21 @@ class _SplashScreenState extends State<SplashScreen>
                     : Text(''))
           ]))
     ]);
+  }
+
+  getData() async {
+    //Check if user is logged in
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (prefs.getBool("logged_in") == true) {
+      Map<String, dynamic> resultsMap =
+          jsonDecode(prefs.getString("profile_data").toString());
+
+      print("Logged " + resultsMap.toString());
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (BuildContext context) => Dashboard(resultsMap)));
+    } else {
+      Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (BuildContext context) => LoginPage()));
+    }
   }
 }

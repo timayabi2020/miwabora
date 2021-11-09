@@ -33,16 +33,15 @@ dependencies:
   awesome_dialog: ^2.1.1
   #flutter_html: ^2.1.5
   flutter_html: ^0.8.2
-  flutter_pdfview: ^1.2.1
   permission_handler: ^8.1.6
   path_provider: ^2.0.4
-  social_share: ^2.1.1
-  social_share_plugin: ^0.3.1+1
-  image_picker: ^0.8.4+1
   share: any
   expandable: ^5.0.1
   android_intent: ^2.0.2
   url_launcher: ^6.0.10
+  advance_pdf_viewer: ^2.0.0
+  dio: ^4.0.1
+  shared_preferences: ^2.0.7
 
 dev_dependencies:
   flutter_test:

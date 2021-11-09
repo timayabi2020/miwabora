@@ -7,6 +7,7 @@ import 'package:miwabora/Config/config.dart';
 import 'package:miwabora/Screens/Mkulima/common_description.dart';
 import 'package:miwabora/Screens/Mkulima/common_disease_description.dart';
 import 'package:miwabora/constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DiseasesPage extends StatefulWidget {
   const DiseasesPage({Key? key}) : super(key: key);
@@ -21,7 +22,7 @@ class _DiseasesPage extends State<DiseasesPage> {
   bool loading = true;
   @override
   void initState() {
-    fetchFarmings().then((data) {
+    getData().then((data) {
       setState(() {
         establishment = data;
         searchList = data;
@@ -53,24 +54,18 @@ class _DiseasesPage extends State<DiseasesPage> {
     return Stack(children: [
       Scaffold(
         appBar: AppBar(
-          title: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-            Container(
-                //padding: EdgeInsets.only(left: size.width * 0.05),
-                //alignment: Alignment.centerLeft,
-                child: Flexible(
-              child: Text("Diseases",
-                  maxLines: 15,
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold)),
-            )),
-            SizedBox(width: size.width * 0.4),
-            Container(
-              // padding: EdgeInsets.only(left: size.width * 0.20),
-              // alignment: Alignment.topRight,
-
-              child: IconButton(
+            title: Row(children: [
+              Flexible(
+                child: Text("Diseases",
+                    maxLines: 15,
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold)),
+              )
+            ]),
+            actions: <Widget>[
+              IconButton(
                 icon: Icon(
                   Icons.refresh,
                   //size: 40,
@@ -83,11 +78,8 @@ class _DiseasesPage extends State<DiseasesPage> {
                     });
                   })
                 },
-              ),
-            )
-          ]),
-          backgroundColor: kPrimaryColor,
-        ),
+              )
+            ]),
         body: SingleChildScrollView(
           child: Row(children: [
             Expanded(
@@ -182,11 +174,40 @@ class _DiseasesPage extends State<DiseasesPage> {
     if (res.statusCode == 200) {
       //var obj = json.decode(res.body);
       Map<String, dynamic> map = json.decode(res.body);
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString("diseases", res.body);
       List<dynamic> data = map["data"];
 
       loading = false;
       return data;
     }
+  }
+
+  Future<List> getData() async {
+    List<dynamic> filteredData = [];
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    if (prefs.getString("diseases") == null) {
+      fetchFarmings().then((data) {
+        setState(() {
+          establishment = data;
+        });
+      });
+    } else {
+      setState(() {
+        loading = true;
+      });
+      String storedData = prefs.getString("diseases").toString();
+      Map<String, dynamic> map = json.decode(storedData);
+      List<dynamic> data = map["data"];
+
+      //filter before returning data.
+      filteredData = data;
+      setState(() {
+        loading = false;
+      });
+    }
+    return filteredData;
   }
 
   void moreDetails(int index, BuildContext context) {

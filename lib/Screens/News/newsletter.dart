@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:http/io_client.dart';
 import 'package:miwabora/Config/config.dart';
 import 'package:miwabora/Screens/Mkulima/common_description.dart';
@@ -34,24 +33,18 @@ class _NewsPageState extends State<NewsPage> {
     return Stack(children: [
       Scaffold(
         appBar: AppBar(
-          title: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-            Container(
-                //padding: EdgeInsets.only(left: size.width * 0.05),
-                //alignment: Alignment.centerLeft,
-                child: Flexible(
-              child: Text("Newsletter",
-                  maxLines: 20,
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold)),
-            )),
-            SizedBox(width: size.width * 0.3),
-            Container(
-              // padding: EdgeInsets.only(left: size.width * 0.20),
-              // alignment: Alignment.topRight,
-
-              child: IconButton(
+            title: Row(children: [
+              Flexible(
+                child: Text("Newsletter",
+                    maxLines: 20,
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold)),
+              )
+            ]),
+            actions: <Widget>[
+              IconButton(
                 icon: Icon(
                   Icons.refresh,
                   //size: 40,
@@ -64,11 +57,8 @@ class _NewsPageState extends State<NewsPage> {
                     });
                   })
                 },
-              ),
-            )
-          ]),
-          backgroundColor: kPrimaryColor,
-        ),
+              )
+            ]),
         body: SingleChildScrollView(
           child: Row(children: [
             Expanded(
@@ -160,8 +150,11 @@ class _NewsPageState extends State<NewsPage> {
       List<dynamic> data = map["data"];
 
       //filter before returning data.
-      List<dynamic> filteredData =
-          data.where((e) => e["type"].toString() == "newsLetter").toList();
+      List<dynamic> filteredData = data
+          .where((e) =>
+              e["type"].toString() == "newsLetter" &&
+              !e["file"]["file_name"].toString().endsWith("..pdf"))
+          .toList();
       loading = false;
       return filteredData;
     }
@@ -171,7 +164,16 @@ class _NewsPageState extends State<NewsPage> {
     String description = establishment[index]["overview"];
     String title = establishment[index]["title"];
     //String imgUrl = establishment[index]['snapshot']['url'];
-    String fileName = ROOT + "/" + establishment[index]["file"]["file_name"];
+    String name = establishment[index]["file"]["file_name"].toString();
+    if (name.contains("..pdf")) {
+      name = name.replaceAll("..pdf", ".pdf");
+    }
+    print("Extracted name " + name);
+    String fileName = FILE_ROOT +
+        "/storage/app/public/" +
+        establishment[index]["file"]["id"].toString() +
+        "/" +
+        name;
     print(fileName);
 
     Navigator.push(
@@ -181,7 +183,7 @@ class _NewsPageState extends State<NewsPage> {
           return PdfViewer(
             url: fileName,
             title: title,
-            path: "",
+            filename: name,
           );
         },
       ),

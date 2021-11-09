@@ -30,3 +30,5 @@ const String APPSTORELINK =
     "https://apps.apple.com/tr/app/miwa-bora/id1543029527#?platform=iphone";
 const String FAQ_CATEGORIES = "$ROOT/api/v1/faq-categories";
 const String FAQ_QUESTIONS = "$ROOT/api/v1/faq-questions";
+
+const String FILE_ROOT = "http://kikosi.co.ke/miwabora";

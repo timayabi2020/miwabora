@@ -31,10 +31,11 @@ import 'package:miwabora/Screens/Profile/profile_breif.dart';
 import 'package:miwabora/components/forgot_password.dart';
 import 'package:miwabora/constants.dart';
 import 'package:share/share.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Dashboard extends StatefulWidget {
-  Map<String, String>? resultsMap;
-  Dashboard(Map<String, String> details) {
+  Map<String, dynamic>? resultsMap;
+  Dashboard(Map<String, dynamic> details) {
     this.resultsMap = details;
   }
 
@@ -43,14 +44,14 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
-  Map<String, String>? details;
+  Map<String, dynamic>? details;
   String? _username;
   String? _phone;
   String? _email;
   String? _userId;
   String? _role;
   String? _miller_id;
-  _DashboardState(Map<String, String>? resultsMap) {
+  _DashboardState(Map<String, dynamic>? resultsMap) {
     this.details = resultsMap;
   }
 
@@ -600,7 +601,10 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  void navigateToLogin(BuildContext context) {
+  void navigateToLogin(BuildContext context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool("logged_in", false);
+    prefs.remove("profile_data");
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (BuildContext context) => LoginPage()),
       (route) => false,

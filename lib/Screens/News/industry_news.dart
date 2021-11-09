@@ -7,6 +7,8 @@ import 'package:miwabora/Config/config.dart';
 import 'package:miwabora/Screens/Mkulima/common_description.dart';
 import 'package:miwabora/constants.dart';
 
+import 'openpdf.dart';
+
 class IndustryNewsPage extends StatefulWidget {
   const IndustryNewsPage({Key? key}) : super(key: key);
 
@@ -32,24 +34,18 @@ class _IndustryNewsPageState extends State<IndustryNewsPage> {
     return Stack(children: [
       Scaffold(
         appBar: AppBar(
-          title: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-            Container(
-                //padding: EdgeInsets.only(left: size.width * 0.05),
-                //alignment: Alignment.centerLeft,
-                child: Flexible(
-              child: Text("Industry News",
-                  maxLines: 20,
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold)),
-            )),
-            SizedBox(width: size.width * 0.2),
-            Container(
-              // padding: EdgeInsets.only(left: size.width * 0.20),
-              // alignment: Alignment.topRight,
-
-              child: IconButton(
+            title: Row(children: [
+              Flexible(
+                child: Text("Industry News",
+                    maxLines: 20,
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold)),
+              )
+            ]),
+            actions: <Widget>[
+              IconButton(
                 icon: Icon(
                   Icons.refresh,
                   //size: 40,
@@ -62,11 +58,8 @@ class _IndustryNewsPageState extends State<IndustryNewsPage> {
                     });
                   })
                 },
-              ),
-            )
-          ]),
-          backgroundColor: kPrimaryColor,
-        ),
+              )
+            ]),
         body: SingleChildScrollView(
           child: Row(children: [
             Expanded(
@@ -88,7 +81,7 @@ class _IndustryNewsPageState extends State<IndustryNewsPage> {
                       return GestureDetector(
                           onTap: () {
                             // doPayment(position, context);
-                            // moreDetails(index, context);
+                            moreDetails(index, context);
                           },
                           child: Card(
                               color: Colors.white,
@@ -168,20 +161,30 @@ class _IndustryNewsPageState extends State<IndustryNewsPage> {
   void moreDetails(int index, BuildContext context) {
     String description = establishment[index]["overview"];
     String title = establishment[index]["title"];
-    String imgUrl = establishment[index]['snapshot']['url'];
-    String fileName = ROOT + "/" + establishment[index]["file"]["filename"];
+    //String imgUrl = establishment[index]['snapshot']['url'];
+    String name = establishment[index]["file"]["file_name"].toString();
+    if (name.contains("..pdf")) {
+      name = name.replaceAll("..pdf", ".pdf");
+    }
+    print("Extracted name " + name);
+    String fileName = FILE_ROOT +
+        "/storage/app/public/" +
+        establishment[index]["file"]["id"].toString() +
+        "/" +
+        name;
+    print(fileName);
 
-    /*Navigator.push(
+    Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) {
-          return MkulimaDescriptionPage(
-            text: description,
+          return PdfViewer(
+            url: fileName,
             title: title,
-            url: imgUrl,
+            filename: name,
           );
         },
       ),
-    );*/
+    );
   }
 }

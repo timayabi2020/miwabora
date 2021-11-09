@@ -13,8 +13,8 @@ import 'package:miwabora/components/rounded_button.dart';
 import 'package:miwabora/constants.dart';
 
 class UpdateOtherRegistrationPage extends StatefulWidget {
-  Map<String, String>? resultsMap;
-  UpdateOtherRegistrationPage(Map<String, String> details) {
+  Map<String, dynamic>? resultsMap;
+  UpdateOtherRegistrationPage(Map<String, dynamic> details) {
     this.resultsMap = details;
   }
 
@@ -47,9 +47,9 @@ class _UpdateOtherRegistrationPageState
   bool _passwordVisible = true;
   bool _confirmpasswordVisible = true;
   List selectedProducts = [];
-  Map<String, String>? details;
+  Map<String, dynamic>? details;
 
-  _UpdateOtherRegistrationPageState(Map<String, String>? resultsMap) {
+  _UpdateOtherRegistrationPageState(Map<String, dynamic>? resultsMap) {
     this.details = resultsMap;
   }
 

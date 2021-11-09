@@ -6,6 +6,7 @@ import 'package:http/io_client.dart';
 import 'package:miwabora/Config/config.dart';
 import 'package:miwabora/Screens/Mkulima/common_description.dart';
 import 'package:miwabora/constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HarvestingPage extends StatefulWidget {
   const HarvestingPage({Key? key}) : super(key: key);
@@ -19,7 +20,7 @@ class _HarvestingPageState extends State<HarvestingPage> {
   bool loading = true;
   @override
   void initState() {
-    fetchFarmings().then((data) {
+    getData().then((data) {
       setState(() {
         establishment = data;
       });
@@ -32,22 +33,17 @@ class _HarvestingPageState extends State<HarvestingPage> {
     return Stack(children: [
       Scaffold(
         appBar: AppBar(
-          title: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-            Container(
-              //padding: EdgeInsets.only(left: size.width * 0.05),
-              //alignment: Alignment.centerLeft,
-              child: Text("Harvesting & Transport",
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold)),
-            ),
-            SizedBox(width: size.width * 0.03),
-            Container(
-              // padding: EdgeInsets.only(left: size.width * 0.20),
-              // alignment: Alignment.topRight,
-
-              child: IconButton(
+            title: Row(children: [
+              Flexible(
+                child: Text("Harvesting & Transport",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold)),
+              )
+            ]),
+            actions: <Widget>[
+              IconButton(
                 icon: Icon(
                   Icons.refresh,
                   //size: 40,
@@ -60,11 +56,8 @@ class _HarvestingPageState extends State<HarvestingPage> {
                     });
                   })
                 },
-              ),
-            )
-          ]),
-          backgroundColor: kPrimaryColor,
-        ),
+              )
+            ]),
         body: SingleChildScrollView(
           child: Row(children: [
             Expanded(
@@ -154,6 +147,8 @@ class _HarvestingPageState extends State<HarvestingPage> {
     if (res.statusCode == 200) {
       //var obj = json.decode(res.body);
       Map<String, dynamic> map = json.decode(res.body);
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString("harvesting", res.body);
       List<dynamic> data = map["data"];
 
       //filter before returning data.
@@ -162,6 +157,39 @@ class _HarvestingPageState extends State<HarvestingPage> {
       loading = false;
       return filteredData;
     }
+  }
+
+  Future<List> getData() async {
+    setState(() {
+      loading = true;
+    });
+
+    List<dynamic> filteredData = [];
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    if (prefs.getString("harvesting") == null) {
+      fetchFarmings().then((data) {
+        setState(() {
+          establishment = data;
+        });
+      });
+
+      setState(() {
+        loading = false;
+      });
+    } else {
+      String storedData = prefs.getString("harvesting").toString();
+      Map<String, dynamic> map = json.decode(storedData);
+      List<dynamic> data = map["data"];
+
+      //filter before returning data.
+      filteredData =
+          data.where((e) => e["category"].toString() == "Farm Demo").toList();
+      setState(() {
+        loading = false;
+      });
+    }
+    return filteredData;
   }
 
   void moreDetails(int index, BuildContext context) {

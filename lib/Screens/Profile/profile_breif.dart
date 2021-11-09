@@ -8,8 +8,8 @@ import 'package:miwabora/components/rounded_button.dart';
 import 'package:miwabora/constants.dart';
 
 class ProfileBrief extends StatefulWidget {
-  Map<String, String>? resultsMap;
-  ProfileBrief(Map<String, String> details) {
+  Map<String, dynamic>? resultsMap;
+  ProfileBrief(Map<String, dynamic> details) {
     this.resultsMap = details;
   }
   @override
@@ -17,13 +17,13 @@ class ProfileBrief extends StatefulWidget {
 }
 
 class _ProfileBriefState extends State<ProfileBrief> {
-  Map<String, String>? details;
+  Map<String, dynamic>? details;
   String? _username;
   String? _phone;
   String? _email;
   String? _userId;
   String? _role;
-  _ProfileBriefState(Map<String, String>? resultsMap) {
+  _ProfileBriefState(Map<String, dynamic>? resultsMap) {
     this.details = resultsMap;
   }
 

@@ -17,6 +17,7 @@ import 'package:miwabora/Screens/Registration/trader_registration.dart';
 import 'package:miwabora/components/forgot_password.dart';
 import 'package:miwabora/components/rounded_button.dart';
 import 'package:miwabora/constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -361,7 +362,7 @@ class _LoginPageState extends State<LoginPage> {
     } else {
       Future<Response> result =
           submit(_username.toString(), _password.toString(), context);
-      result.then((response) {
+      result.then((response) async {
         if (response.statusCode == 200) {
           // If the server did return a 201 CREATED response,
           // then parse the JSON.
@@ -378,7 +379,7 @@ class _LoginPageState extends State<LoginPage> {
               this._password = "";
             });
 
-            //put every thing into a map and navigate to dashboard
+            //put every thing into a map and navigate to dashboard. Also save into shared preferences
             Map<String, String> resultsMap = new HashMap();
             resultsMap.putIfAbsent("token", () => result.token.toString());
             resultsMap.putIfAbsent("userid", () => result.userid.toString());
@@ -409,6 +410,10 @@ class _LoginPageState extends State<LoginPage> {
             resultsMap.putIfAbsent("zone", () => result.zone.toString());
             resultsMap.putIfAbsent(
                 "username", () => result.username.toString());
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            var sharedData = json.encode(resultsMap);
+            prefs.setString("profile_data", sharedData);
+            prefs.setBool("logged_in", true);
             navigateToDashboard(context, resultsMap);
           }
         } else {
