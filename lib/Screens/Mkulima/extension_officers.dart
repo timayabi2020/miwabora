@@ -1,11 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:android_intent/android_intent.dart';
 import 'package:flutter/material.dart';
 import 'package:http/io_client.dart';
 import 'package:miwabora/Config/config.dart';
 import 'package:miwabora/Screens/Mkulima/common_description.dart';
 import 'package:miwabora/constants.dart';
+import 'package:share/share.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class OfficersPage extends StatefulWidget {
   String? millerId;
@@ -37,6 +40,7 @@ class _OfficersPageState extends State<OfficersPage> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+    var platform = Theme.of(context).platform;
     return Stack(children: [
       Container(
           decoration: BoxDecoration(
@@ -59,7 +63,7 @@ class _OfficersPageState extends State<OfficersPage> {
                         fontSize: 18,
                         fontWeight: FontWeight.bold)),
               )),
-              SizedBox(width: size.width * 0.3),
+              SizedBox(width: size.width * 0.2),
               Container(
                 // padding: EdgeInsets.only(left: size.width * 0.20),
                 // alignment: Alignment.topRight,
@@ -214,7 +218,7 @@ class _OfficersPageState extends State<OfficersPage> {
                                         //size: 40,
                                         ),
                                     color: Colors.green,
-                                    onPressed: () => {},
+                                    onPressed: () => {callOfficer(establishment[0]["contact_phone_1"])},
                                   ),
                           ),
                         ),
@@ -243,7 +247,7 @@ class _OfficersPageState extends State<OfficersPage> {
                                           //size: 40,
                                           ),
                                       color: Colors.green,
-                                      onPressed: () => {},
+                                      onPressed: () => {callOfficer(establishment[0]["contact_phone_1"])},
                                     )),
                         ),
                       ]),
@@ -271,7 +275,10 @@ class _OfficersPageState extends State<OfficersPage> {
                                           //size: 40,
                                           ),
                                       color: Colors.redAccent,
-                                      onPressed: () => {},
+                                      onPressed: () => {
+                                        sendMail(context, platform,
+                                            establishment[0]["contact_email"])
+                                      },
                                     )),
                         ),
                       ]),
@@ -353,4 +360,51 @@ class _OfficersPageState extends State<OfficersPage> {
       thickness: 1.5,
     );
   }
+
+  sendMail(BuildContext context, TargetPlatform platform, mailTo) {
+    // if (platform == TargetPlatform.iOS) {
+    /*final Uri emailLaunchUri = Uri(
+      scheme: 'mailto',
+      path: mailTo,
+      query: encodeQueryParameters(
+          <String, String>{'subject': 'Miwa Bora Queries'}),
+    );
+    launch(emailLaunchUri.toString()).catchError((e) {});
+    } else {
+      AndroidIntent intent = AndroidIntent(
+        action: 'android.intent.action.MAIN',
+        category: 'android.intent.category.APP_EMAIL',
+      );
+      intent.launch().catchError((e) {
+        ;
+      });
+    }*/
+    RenderBox box = context.findRenderObject()! as RenderBox;
+
+    // final RenderBox box =context.findRenderObject() as RenderObject;
+    Share.share("Mail to Extension Officer",
+        subject: "Miwa Bora",
+        sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size);
+  }
+
+  String? encodeQueryParameters(Map<String, String> params) {
+    return params.entries
+        .map((e) =>
+            '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+        .join('&');
+  }
+  Future<void> _launched;
+
+Future<void> _openUrl(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+}
+void callOfficer(String phone){
+  setState(() {
+  _launched = _openUrl('tel:${phone}');
+});
+}
 }

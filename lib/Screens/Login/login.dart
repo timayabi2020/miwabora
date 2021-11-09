@@ -85,7 +85,7 @@ class _LoginPageState extends State<LoginPage> {
                         Align(
                             alignment: Alignment.center,
                             child: Image.asset(
-                              "assets/images/ic_miwa_logo.png",
+                              "assets/images/logobora.png",
                               width: 250,
                             )),
                         Text(

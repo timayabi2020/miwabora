@@ -1,8 +1,13 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:miwabora/Config/config.dart';
+import 'package:miwabora/Screens/About/about.dart';
 import 'package:miwabora/Screens/Feedback/complaints.dart';
 import 'package:miwabora/Screens/Feedback/questions.dart';
+import 'package:miwabora/Screens/Help/help.dart';
 import 'package:miwabora/Screens/Login/login.dart';
+import 'package:miwabora/Screens/Millers/investment.dart';
+import 'package:miwabora/Screens/Millers/production_cost.dart';
 import 'package:miwabora/Screens/Mkulima/cane_varieties.dart';
 import 'package:miwabora/Screens/Mkulima/cba.dart';
 import 'package:miwabora/Screens/Mkulima/cba_templates.dart';
@@ -12,11 +17,20 @@ import 'package:miwabora/Screens/Mkulima/extension_officers.dart';
 import 'package:miwabora/Screens/Mkulima/gettingstarted.dart';
 import 'package:miwabora/Screens/Mkulima/harvesting.dart';
 import 'package:miwabora/Screens/Mkulima/innovation.dart';
+import 'package:miwabora/Screens/Mkulima/pests.dart';
 import 'package:miwabora/Screens/Mkulima/production_environment.dart';
 import 'package:miwabora/Screens/Mkulima/sugar_cane_establishment.dart';
+import 'package:miwabora/Screens/Mkulima/weeds.dart';
+import 'package:miwabora/Screens/News/industry_news.dart';
+import 'package:miwabora/Screens/News/newsletter.dart';
+import 'package:miwabora/Screens/News/sugar_prices.dart';
+import 'package:miwabora/Screens/News/sugarcabnebrands.dart';
+import 'package:miwabora/Screens/News/tech.dart';
+import 'package:miwabora/Screens/News/value_addition.dart';
 import 'package:miwabora/Screens/Profile/profile_breif.dart';
 import 'package:miwabora/components/forgot_password.dart';
 import 'package:miwabora/constants.dart';
+import 'package:share/share.dart';
 
 class Dashboard extends StatefulWidget {
   Map<String, String>? resultsMap;
@@ -119,10 +133,23 @@ class _DashboardState extends State<Dashboard> {
     _DiseaseItem('assets/images/ic_pest_foreground.png', 'Weeds'),
     _DiseaseItem('assets/images/ic_cam_cam.png', 'Disease Diagnosis'),
   ];
+  shareSocialMedia(BuildContext context, TargetPlatform platform) {
+    String text = PLAYSTORELINK;
+    if (platform == TargetPlatform.iOS) {
+      text = APPSTORELINK;
+    }
+    RenderBox box = context.findRenderObject()! as RenderBox;
+
+    // final RenderBox box =context.findRenderObject() as RenderObject;
+    Share.share(text,
+        subject: "Miwa Bora",
+        sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size);
+  }
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+    var platform = Theme.of(context).platform;
     return DefaultTabController(
         length: 4,
         child: Scaffold(
@@ -172,7 +199,7 @@ class _DashboardState extends State<Dashboard> {
             DrawerHeader(
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                  children: <Widget>[
                     OutlinedButton(
                       onPressed: () {},
                       //child: Text('Button'),
@@ -215,10 +242,10 @@ class _DashboardState extends State<Dashboard> {
               leading: new IconButton(
                   icon: Icon(Icons.info),
                   onPressed: () {
-                    //_displayDialog(context);
+                    navigateToAbout(context);
                   }),
               onTap: () {
-                //_displayDialog(context);
+                navigateToAbout(context);
               },
             ),
             ListTile(
@@ -226,10 +253,10 @@ class _DashboardState extends State<Dashboard> {
               leading: new IconButton(
                   icon: Icon(Icons.help),
                   onPressed: () {
-                    //_displayDialog(context);
+                    navigateToHelp(context);
                   }),
               onTap: () {
-                //_displayDialog(context);
+                navigateToHelp(context);
               },
             ),
             ListTile(
@@ -237,10 +264,11 @@ class _DashboardState extends State<Dashboard> {
               leading: new IconButton(
                   icon: Icon(Icons.share),
                   onPressed: () {
-                    //_displayDialog(context);
+                    shareSocialMedia(context, platform);
                   }),
               onTap: () {
                 //_displayDialog(context);
+                shareSocialMedia(context, platform);
               },
             ),
             buildDivider(),
@@ -360,8 +388,7 @@ class _DashboardState extends State<Dashboard> {
                   itemBuilder: (context, position) {
                     return GestureDetector(
                       onTap: () {
-                        // doPayment(position, context);
-                        //openServices(position, context);
+                        openNewsServices(position, context, size);
                       },
                       child: Card(
                         semanticContainer: true,
@@ -383,7 +410,8 @@ class _DashboardState extends State<Dashboard> {
                                               TextStyle(color: kPrimaryColor)),
                                       onPressed: () {
                                         // openServices(
-                                        //   position, context);
+                                        openNewsServices(
+                                            position, context, size);
                                       },
                                     ),
                                   ],
@@ -410,7 +438,7 @@ class _DashboardState extends State<Dashboard> {
                     return GestureDetector(
                       onTap: () {
                         // doPayment(position, context);
-                        openServices(position, context);
+                        openMillerServices(position, context, size);
                       },
                       child: Card(
                         semanticContainer: true,
@@ -431,7 +459,8 @@ class _DashboardState extends State<Dashboard> {
                                           style:
                                               TextStyle(color: kPrimaryColor)),
                                       onPressed: () {
-                                        openServices(position, context);
+                                        openMillerServices(
+                                            position, context, size);
                                       },
                                     ),
                                   ],
@@ -643,6 +672,17 @@ class _DashboardState extends State<Dashboard> {
       MaterialPageRoute(
         builder: (context) {
           return ProductionEnvironmentPage();
+        },
+      ),
+    );
+  }
+
+  void navigateToAbout(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return About();
         },
       ),
     );
@@ -880,8 +920,9 @@ class _DashboardState extends State<Dashboard> {
     if (position == 0) {
       navigateToDisease(context);
     } else if (position == 1) {
+      navigateToPests(context);
     } else if (position == 2) {
-    } else if (position == 3) {
+      navigateToWeeds(context);
     } else {}
   }
 
@@ -891,6 +932,151 @@ class _DashboardState extends State<Dashboard> {
       MaterialPageRoute(
         builder: (context) {
           return DiseasesPage();
+        },
+      ),
+    );
+  }
+
+  void navigateToWeeds(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return WeedsPage();
+        },
+      ),
+    );
+  }
+
+  void navigateToBrands(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return BrandsPage();
+        },
+      ),
+    );
+  }
+
+  void navigateToPrices(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return SugarCanePricesPage();
+        },
+      ),
+    );
+  }
+
+  void navigateToIndustryNews(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return IndustryNewsPage();
+        },
+      ),
+    );
+  }
+
+  void navigateToNews(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return NewsPage();
+        },
+      ),
+    );
+  }
+
+  void navigateToPests(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return PestsPage();
+        },
+      ),
+    );
+  }
+
+  void openNewsServices(int position, BuildContext context, Size size) {
+    if (position == 0) {
+      navigateToIndustryNews(context);
+    } else if (position == 1) {
+      navigateToNews(context);
+    } else if (position == 2) {
+      navigateToBrands(context);
+    } else if (position == 3) {
+      navigateToPrices(context);
+    }
+  }
+
+  void openMillerServices(int position, BuildContext context, Size size) {
+    if (position == 0) {
+      navigateToOpportunities(context);
+    } else if (position == 1) {
+      navigateToTech(context);
+    } else if (position == 2) {
+      navigateToProductionCost(context);
+    } else if (position == 3) {
+      navigateToInvestmentOpportunities(context);
+    }
+  }
+
+  void navigateToOpportunities(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return ValueAdditionPage();
+        },
+      ),
+    );
+  }
+
+  void navigateToProductionCost(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return ProductionPage();
+        },
+      ),
+    );
+  }
+
+  void navigateToTech(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return TechnologyPage();
+        },
+      ),
+    );
+  }
+
+  void navigateToInvestmentOpportunities(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return InvestPage();
+        },
+      ),
+    );
+  }
+
+  void navigateToHelp(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return Help();
         },
       ),
     );

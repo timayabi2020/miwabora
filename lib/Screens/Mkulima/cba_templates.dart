@@ -88,7 +88,7 @@ class _CBATemplatePageState extends State<CBATemplatePage> {
                       return GestureDetector(
                           onTap: () {
                             // doPayment(position, context);
-                            moreDetails(index, context);
+                            // moreDetails(index, context);
                           },
                           child: Card(
                               color: Colors.white,

@@ -65,7 +65,7 @@ class _DiseasesPage extends State<DiseasesPage> {
                       fontSize: 18,
                       fontWeight: FontWeight.bold)),
             )),
-            SizedBox(width: size.width * 0.03),
+            SizedBox(width: size.width * 0.4),
             Container(
               // padding: EdgeInsets.only(left: size.width * 0.20),
               // alignment: Alignment.topRight,
