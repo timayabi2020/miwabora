@@ -1,4 +1,4 @@
-com.example.miwabora
+com.kikosi.miwabora
 attr alpha
 attr font
 attr fontProviderAuthority
@@ -126,6 +126,7 @@ layout notification_template_icon_group
 layout notification_template_part_chronometer
 layout notification_template_part_time
 mipmap ic_launcher
+mipmap launcher_icon
 string status_bar_notification_info_overflow
 style LaunchTheme
 style NormalTheme
@@ -142,4 +143,5 @@ styleable FontFamilyFont android_font android_fontWeight android_fontStyle andro
 styleable GradientColor android_startColor android_endColor android_type android_centerX android_centerY android_gradientRadius android_tileMode android_centerColor android_startX android_startY android_endX android_endY
 styleable GradientColorItem android_color android_offset
 xml filepaths
+xml flutter_image_picker_file_paths
 xml flutter_share_file_paths

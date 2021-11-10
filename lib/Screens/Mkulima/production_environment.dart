@@ -161,9 +161,12 @@ class _ProductionEnvironmentPage extends State<ProductionEnvironmentPage> {
         List<dynamic> data = map["data"];
 
         //filter before returning data.
-        List<dynamic> filteredData = data
+        filteredData = data
             .where((e) => e["category"].toString() == "production")
             .toList();
+        setState(() {
+          establishment = filteredData;
+        });
         loading = false;
       }
     } catch (e) {

@@ -49,7 +49,9 @@ class _GettingStartedPageState extends State<GettingStartedPage> {
             child: Column(
               children: [
                 Container(
-                    child: this.internetCheck == false
+                    child: this.internetCheck == false ||
+                            establishment == null ||
+                            establishment.length == 0
                         ? Image.asset(
                             "assets/images/logobora.png",
                             width: 250,
@@ -75,9 +77,10 @@ class _GettingStartedPageState extends State<GettingStartedPage> {
                           )),
                       Container(
                           padding: EdgeInsets.only(left: size.width * 0.05),
-                          child: establishment.length == 0
-                              ? Text("Loading...")
-                              : Html(data: establishment[0]['description']))
+                          child:
+                              establishment == null || establishment.length == 0
+                                  ? Text("Loading...")
+                                  : Html(data: establishment[0]['description']))
                     ]))
               ],
             ),
@@ -112,9 +115,12 @@ class _GettingStartedPageState extends State<GettingStartedPage> {
         List<dynamic> data = map["data"];
 
         //filter before returning data.
-        List<dynamic> filteredData =
+        filteredData =
             data.where((e) => e["category"].toString() == "mkulima").toList();
         loading = false;
+        setState(() {
+          establishment = filteredData;
+        });
       }
     } catch (e) {
       loading = false;

@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:miwabora/Config/config.dart';
 import 'package:miwabora/Screens/About/about.dart';
 import 'package:miwabora/Screens/Feedback/complaints.dart';
@@ -12,6 +15,7 @@ import 'package:miwabora/Screens/Mkulima/cane_varieties.dart';
 import 'package:miwabora/Screens/Mkulima/cba.dart';
 import 'package:miwabora/Screens/Mkulima/cba_templates.dart';
 import 'package:miwabora/Screens/Mkulima/crop_management.dart';
+import 'package:miwabora/Screens/Mkulima/diagnosis.dart';
 import 'package:miwabora/Screens/Mkulima/diseases.dart';
 import 'package:miwabora/Screens/Mkulima/extension_officers.dart';
 import 'package:miwabora/Screens/Mkulima/gettingstarted.dart';
@@ -51,6 +55,8 @@ class _DashboardState extends State<Dashboard> {
   String? _userId;
   String? _role;
   String? _miller_id;
+  XFile? imageFile;
+  XFile? diseaseFile;
   _DashboardState(Map<String, dynamic>? resultsMap) {
     this.details = resultsMap;
   }
@@ -58,6 +64,7 @@ class _DashboardState extends State<Dashboard> {
   @override
   void initState() {
     _extractDetails();
+    _extractProfilePic();
     //
   }
 
@@ -205,30 +212,45 @@ class _DashboardState extends State<Dashboard> {
           drawer: Drawer(
               child: ListView(padding: EdgeInsets.zero, children: <Widget>[
             DrawerHeader(
+              margin: EdgeInsets.all(1.0),
+              padding: EdgeInsets.all(1.0),
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    OutlinedButton(
-                      onPressed: () {},
-                      //child: Text('Button'),
-                      style: OutlinedButton.styleFrom(
-                        shape: CircleBorder(),
-                        padding: EdgeInsets.all(40),
-                        backgroundColor: kPrimaryColor,
-                        side: BorderSide(color: kPrimaryColor, width: 1),
-                      ),
-                      child: Text(
-                        _username!.characters
-                            .characterAt(0)
-                            .toString()
-                            .toUpperCase(),
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
-                      ),
-                    ),
+                    this.imgNullCheck() == false
+                        ? Container(
+                            width: MediaQuery.of(context).size.width * 0.35,
+                            height: MediaQuery.of(context).size.height * 0.2,
+                            // margin: EdgeInsets.only(top: 2),
+                            decoration: BoxDecoration(
+                                color: Colors.grey,
+                                shape: BoxShape.circle,
+                                image: DecorationImage(
+                                    image: FileImage(File(imageFile!.path)),
+                                    fit: BoxFit.cover)))
+                        : OutlinedButton(
+                            onPressed: () {},
+                            //child: Text('Button'),
+                            style: OutlinedButton.styleFrom(
+                              shape: CircleBorder(),
+                              padding: EdgeInsets.all(40),
+                              backgroundColor: kPrimaryColor,
+                              side: BorderSide(color: kPrimaryColor, width: 1),
+                            ),
+
+                            child: Text(
+                              _username!.characters
+                                  .characterAt(0)
+                                  .toString()
+                                  .toUpperCase(),
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
                     Text(
                       this._username.toString(),
-                      style: TextStyle(fontSize: 15),
+                      style: TextStyle(fontSize: 13),
                     ),
                     Text(this._email!),
                   ]),
@@ -289,10 +311,10 @@ class _DashboardState extends State<Dashboard> {
               leading: new IconButton(
                   icon: Icon(Icons.camera),
                   onPressed: () {
-                    //_displayDialog(context);
+                    imageSelector(context, "camera");
                   }),
               onTap: () {
-                //_displayDialog(context);
+                imageSelector(context, "camera");
               },
             ),
             ListTile(
@@ -300,10 +322,10 @@ class _DashboardState extends State<Dashboard> {
               leading: new IconButton(
                   icon: Icon(Icons.photo_library),
                   onPressed: () {
-                    //_displayDialog(context);
+                    imageSelector(context, "gallery");
                   }),
               onTap: () {
-                //_displayDialog(context);
+                imageSelector(context, "gallery");
               },
             ),
             buildDivider(),
@@ -1009,7 +1031,9 @@ class _DashboardState extends State<Dashboard> {
       navigateToPests(context);
     } else if (position == 2) {
       navigateToWeeds(context);
-    } else {}
+    } else {
+      _settingModalBottomSheet(context);
+    }
   }
 
   void navigateToDisease(BuildContext context) {
@@ -1173,6 +1197,84 @@ class _DashboardState extends State<Dashboard> {
       this.goToCBA(context);
     } else {
       this.goToTemplates(context);
+    }
+  }
+
+  void _extractProfilePic() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (prefs.getString("profile_pic") != null) {
+      String path = prefs.getString("profile_pic").toString();
+
+      XFile preloaded = new XFile(path);
+      setState(() {
+        imageFile = preloaded;
+      });
+    }
+  }
+
+  bool imgNullCheck() {
+    return this.imageFile == null;
+  }
+
+  void _settingModalBottomSheet(context) {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext bc) {
+          return Container(
+            child: new Wrap(
+              children: <Widget>[
+                new ListTile(
+                    title: new Text('Gallery'),
+                    onTap: () => {
+                          imageSelector(context, "gallery"),
+                          Navigator.pop(context),
+                        }),
+                new ListTile(
+                  title: new Text('Camera'),
+                  onTap: () => {
+                    imageSelector(context, "camera"),
+                    Navigator.pop(context)
+                  },
+                ),
+              ],
+            ),
+          );
+        });
+  }
+
+  void _takePhoto() async {}
+  Future imageSelector(BuildContext context, String pickerType) async {
+    ImagePicker _picker = new ImagePicker();
+    switch (pickerType) {
+      case "gallery":
+
+        /// GALLERY IMAGE PICKER
+        diseaseFile = (await _picker.pickImage(
+            source: ImageSource.gallery, imageQuality: 90)) as XFile;
+        break;
+
+      case "camera": // CAMERA CAPTURE CODE
+        diseaseFile = (await _picker.pickImage(
+            source: ImageSource.camera, imageQuality: 90)) as XFile;
+        break;
+    }
+
+    if (diseaseFile != null) {
+      print("You selected  image : " + diseaseFile!.path);
+
+      //navigate to diagnosis page
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) {
+            return DIagnosisPage(
+              imgPath: diseaseFile!.path.toString(),
+            );
+          },
+        ),
+      );
+    } else {
+      //print("You have not taken image");
     }
   }
 }

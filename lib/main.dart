@@ -79,7 +79,7 @@ class _SplashScreenState extends State<SplashScreen>
       Map<String, dynamic> resultsMap =
           jsonDecode(prefs.getString("profile_data").toString());
 
-      print("Logged " + resultsMap.toString());
+      // print("Logged " + resultsMap.toString());
       Navigator.of(context).pushReplacement(MaterialPageRoute(
           builder: (BuildContext context) => Dashboard(resultsMap)));
     } else {

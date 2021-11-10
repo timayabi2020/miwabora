@@ -125,6 +125,7 @@ int layout notification_template_icon_group 0x7f070004
 int layout notification_template_part_chronometer 0x7f070005
 int layout notification_template_part_time 0x7f070006
 int mipmap ic_launcher 0x7f080000
+int mipmap launcher_icon 0x7f080001
 int string status_bar_notification_info_overflow 0x7f090000
 int style LaunchTheme 0x7f0a0000
 int style NormalTheme 0x7f0a0001
@@ -174,4 +175,5 @@ int[] styleable GradientColorItem { 0x010101a5, 0x01010514 }
 int styleable GradientColorItem_android_color 0
 int styleable GradientColorItem_android_offset 1
 int xml filepaths 0x7f0c0000
-int xml flutter_share_file_paths 0x7f0c0001
+int xml flutter_image_picker_file_paths 0x7f0c0001
+int xml flutter_share_file_paths 0x7f0c0002

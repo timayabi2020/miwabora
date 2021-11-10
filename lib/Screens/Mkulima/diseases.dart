@@ -36,7 +36,9 @@ class _DiseasesPage extends State<DiseasesPage> {
 
   void _runFilter(String enteredKeyword) {
     List results = [];
-    if (enteredKeyword.isEmpty) {
+    if (enteredKeyword == null ||
+        enteredKeyword == "" ||
+        enteredKeyword.isEmpty) {
       // if the search field is empty or only contains white-space, we'll display all users
       results = establishment;
     } else {

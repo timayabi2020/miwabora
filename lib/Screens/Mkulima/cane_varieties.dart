@@ -186,8 +186,10 @@ class _CaneVarietyPage extends State<CaneVarietyPage> {
         List<dynamic> data = map["data"];
 
         //filter before returning data.
-        List<dynamic> filteredData =
-            data.where((e) => e["photo"] != null).toList();
+        filteredData = data.where((e) => e["photo"] != null).toList();
+        setState(() {
+          establishment = filteredData;
+        });
         loading = false;
       }
     } catch (e) {

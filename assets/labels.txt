@@ -1,0 +1,10 @@
+.ipynb_checkpoints
+Sugarcane Eye Spot
+Sugarcane Mosaic Virus
+Sugarcane Pineapple Disease
+Sugarcane Pokkah Boeng Disease
+Sugarcane Ratoon Stunting Disease
+Sugarcane Red Rot
+Sugarcane Rust Disease
+Sugarcane Smut
+Sugarcane Wilt
