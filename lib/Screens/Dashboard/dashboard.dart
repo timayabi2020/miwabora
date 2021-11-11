@@ -1268,8 +1268,7 @@ class _DashboardState extends State<Dashboard> {
         MaterialPageRoute(
           builder: (context) {
             return DIagnosisPage(
-              imgPath: diseaseFile!.path.toString(),
-            );
+                imgPath: diseaseFile!.path.toString(), payload: details!);
           },
         ),
       );

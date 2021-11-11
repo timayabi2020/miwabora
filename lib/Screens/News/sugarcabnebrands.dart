@@ -207,9 +207,6 @@ class _BrandsPage extends State<BrandsPage> {
 
         //filter before returning data.
         loading = false;
-        setState(() {
-          establishment = data;
-        });
       }
     } catch (e) {}
     return data;
@@ -218,26 +215,44 @@ class _BrandsPage extends State<BrandsPage> {
   Future<List> getData() async {
     List<dynamic> filteredData = [];
     SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    if (prefs.getString("brands") == null) {
-      fetchFarmings().then((data) {
-        setState(() {
-          establishment = data;
+    loading = true;
+    try {
+      if (prefs.getString("brands") == null) {
+        final ioc = new HttpClient();
+        ioc.badCertificateCallback =
+            (X509Certificate cert, String host, int port) => true;
+        final http = new IOClient(ioc);
+        var res = await http
+            .get(Uri.parse(SUGARCANEBRANDS), headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          //'Authorization': 'AppBearer ' + token,
         });
-      });
-    } else {
-      setState(() {
-        loading = true;
-      });
-      String storedData = prefs.getString("brands").toString();
-      Map<String, dynamic> map = json.decode(storedData);
-      List<dynamic> data = map["data"];
+        if (res.statusCode == 200) {
+          //var obj = json.decode(res.body);
+          Map<String, dynamic> map = json.decode(res.body);
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setString("brands", res.body);
+          filteredData = map["data"];
 
-      //filter before returning data.
-      filteredData = data;
-      setState(() {
-        loading = false;
-      });
+          //filter before returning data.
+          loading = false;
+        }
+      } else {
+        setState(() {
+          loading = true;
+        });
+        String storedData = prefs.getString("brands").toString();
+        Map<String, dynamic> map = json.decode(storedData);
+        List<dynamic> data = map["data"];
+
+        //filter before returning data.
+        filteredData = data;
+        setState(() {
+          loading = false;
+        });
+      }
+    } catch (e) {
+      loading = false;
     }
     return filteredData;
   }

@@ -523,7 +523,7 @@ class _FarmerRegistrationPageState extends State<FarmerRegistrationPage> {
                                   items: counties.map(
                                     (val) {
                                       return DropdownMenuItem<String>(
-                                        value: val['id'].toString(),
+                                        value: val['name'].toString(),
                                         child: Text(val['name']),
                                       );
                                     },
@@ -573,7 +573,7 @@ class _FarmerRegistrationPageState extends State<FarmerRegistrationPage> {
                                   items: filtererd_subcounties.map(
                                     (val) {
                                       return DropdownMenuItem<String>(
-                                        value: val['id'].toString(),
+                                        value: val['ward'].toString(),
                                         child: Text(val['ward']),
                                       );
                                     },

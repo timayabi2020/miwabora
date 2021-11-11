@@ -570,7 +570,7 @@ class _UpdateFarmerRegistrationPageState
                                   items: counties.map(
                                     (val) {
                                       return DropdownMenuItem<String>(
-                                        value: val['id'].toString(),
+                                        value: val['name'].toString(),
                                         child: Text(val['name']),
                                       );
                                     },
@@ -615,7 +615,7 @@ class _UpdateFarmerRegistrationPageState
                                   items: filtererd_subcounties.map(
                                     (val) {
                                       return DropdownMenuItem<String>(
-                                        value: val['id'].toString(),
+                                        value: val['ward'].toString(),
                                         child: Text(val['ward']),
                                       );
                                     },
@@ -977,6 +977,25 @@ class _UpdateFarmerRegistrationPageState
 
   void preloadedSubCountyInfo(String s) {
     print(this.filtererd_subcounties);
+  }
+
+  bool isNumericUsing_tryParse(String string) {
+    // Null or empty string is not a number
+    if (string == null || string.isEmpty) {
+      return false;
+    }
+
+    // Try to parse input string to number.
+    // Both integer and double work.
+    // Use int.tryParse if you want to check integer only.
+    // Use double.tryParse if you want to check double only.
+    final number = num.tryParse(string);
+
+    if (number == null) {
+      return false;
+    }
+
+    return true;
   }
 }
 

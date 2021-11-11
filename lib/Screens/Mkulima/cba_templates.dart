@@ -163,11 +163,9 @@ class _CBATemplatePageState extends State<CBATemplatePage> {
         List<dynamic> data = map["data"];
 
         //filter before returning data.
-        List<dynamic> filteredData =
+        filteredData =
             data.where((e) => e["type"].toString() == "farm").toList();
-        setState(() {
-          establishment = filteredData;
-        });
+
         loading = false;
       }
     } catch (e) {
@@ -176,29 +174,51 @@ class _CBATemplatePageState extends State<CBATemplatePage> {
     return filteredData;
   }
 
-  Future<List> getData() async {
+  Future getData() async {
     List<dynamic> filteredData = [];
     SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    if (prefs.getString("templates") == null) {
-      fetchFarmings().then((data) {
-        setState(() {
-          establishment = data;
+    loading = true;
+    try {
+      if (prefs.getString("templates") == null) {
+        final ioc = new HttpClient();
+        ioc.badCertificateCallback =
+            (X509Certificate cert, String host, int port) => true;
+        final http = new IOClient(ioc);
+        var res =
+            await http.get(Uri.parse(PUBLICATIONS), headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          //'Authorization': 'AppBearer ' + token,
         });
-      });
-    } else {
-      setState(() {
-        loading = true;
-      });
-      String storedData = prefs.getString("templates").toString();
-      Map<String, dynamic> map = json.decode(storedData);
-      List<dynamic> data = map["data"];
+        if (res.statusCode == 200) {
+          //var obj = json.decode(res.body);
+          Map<String, dynamic> map = json.decode(res.body);
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setString("templates", res.body);
+          List<dynamic> data = map["data"];
 
-      //filter before returning data.
-      filteredData = data.where((e) => e["type"].toString() == "farm").toList();
-      setState(() {
-        loading = false;
-      });
+          //filter before returning data.
+          filteredData =
+              data.where((e) => e["type"].toString() == "farm").toList();
+
+          loading = false;
+        }
+      } else {
+        setState(() {
+          loading = true;
+        });
+        String storedData = prefs.getString("templates").toString();
+        Map<String, dynamic> map = json.decode(storedData);
+        List<dynamic> data = map["data"];
+
+        //filter before returning data.
+        filteredData =
+            data.where((e) => e["type"].toString() == "farm").toList();
+        setState(() {
+          loading = false;
+        });
+      }
+    } catch (e) {
+      loading = false;
     }
     return filteredData;
   }

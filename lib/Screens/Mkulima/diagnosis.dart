@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:miwabora/Screens/Dashboard/dashboard.dart';
 import 'package:miwabora/components/rounded_button.dart';
 import 'package:miwabora/constants.dart';
 import 'package:tflite/tflite.dart';
@@ -12,21 +13,24 @@ import 'package:flutter/services.dart';
 
 class DIagnosisPage extends StatefulWidget {
   final String? imgPath;
+  final Map<String, dynamic>? payload;
 
-  const DIagnosisPage({Key? key, this.imgPath}) : super(key: key);
+  const DIagnosisPage({Key? key, this.imgPath, this.payload}) : super(key: key);
 
   @override
-  _DIagnosisPageState createState() => _DIagnosisPageState(imgPath);
+  _DIagnosisPageState createState() => _DIagnosisPageState(imgPath, payload);
 }
 
 class _DIagnosisPageState extends State<DIagnosisPage> {
   String? _path;
+  Map<String, dynamic>? _payload;
   List? _listResult;
   bool _loading = false;
   XFile? imageFile;
   String resultMessage = "Please click on the classify button";
-  _DIagnosisPageState(String? imgPath) {
+  _DIagnosisPageState(String? imgPath, Map<String, dynamic>? payload) {
     this._path = imgPath;
+    this._payload = payload;
   }
   @override
   void initState() {
@@ -172,7 +176,17 @@ class _DIagnosisPageState extends State<DIagnosisPage> {
                         ),
                       ]),
                       SizedBox(height: size.height * 0.03),
-                    ])))
+                    ]))),
+            RoundedButton(
+              text: "GO BACK",
+              color: Colors.grey,
+              sizeval: 0.9,
+              press: () {
+                //  buildShowDialog(context);
+                //logoutAlertDialog(context);
+                navigateToDashboard(context);
+              },
+            )
           ],
         )));
   }
@@ -287,5 +301,13 @@ class _DIagnosisPageState extends State<DIagnosisPage> {
     var longVal = double.parse(val);
     print(longVal);
     return (longVal * 100).toDouble().toStringAsFixed(2) + "%";
+  }
+
+  void navigateToDashboard(BuildContext context) {
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(
+          builder: (BuildContext context) => Dashboard(_payload!)),
+      (route) => false,
+    );
   }
 }

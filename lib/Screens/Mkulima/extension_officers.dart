@@ -299,60 +299,88 @@ class _OfficersPageState extends State<OfficersPage> {
 
   Future fetchFarmings() async {
     loading = true;
-    print("Here *** " + _miller_id.toString());
-    final ioc = new HttpClient();
-    ioc.badCertificateCallback =
-        (X509Certificate cert, String host, int port) => true;
-    final http = new IOClient(ioc);
-    var res =
-        await http.get(Uri.parse(EXTENSION_OFFICERS), headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-      //'Authorization': 'AppBearer ' + token,
-    });
-    if (res.statusCode == 200) {
-      //var obj = json.decode(res.body);
-      Map<String, dynamic> map = json.decode(res.body);
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setString("officers", res.body);
-      List<dynamic> data = map["data"];
-
-      //filter before returning data.
-      List<dynamic> filteredData = data
-          .where((e) => e["company"]["id"].toString() == _miller_id.toString())
-          .toList();
-      loading = false;
-      setState(() {
-        establishment = filteredData;
+    List<dynamic> filteredData = [];
+    try {
+      final ioc = new HttpClient();
+      ioc.badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+      final http = new IOClient(ioc);
+      var res = await http
+          .get(Uri.parse(EXTENSION_OFFICERS), headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        //'Authorization': 'AppBearer ' + token,
       });
-      return filteredData;
+      if (res.statusCode == 200) {
+        //var obj = json.decode(res.body);
+        Map<String, dynamic> map = json.decode(res.body);
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString("officers", res.body);
+        List<dynamic> data = map["data"];
+
+        //filter before returning data.
+        filteredData = data
+            .where(
+                (e) => e["company"]["id"].toString() == _miller_id.toString())
+            .toList();
+        loading = false;
+        setState(() {
+          establishment = filteredData;
+        });
+      }
+    } catch (e) {
+      loading = false;
     }
+    return filteredData;
   }
 
   Future<List> getData() async {
     List<dynamic> filteredData = [];
     SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    if (prefs.getString("officers") == null) {
-      fetchFarmings().then((data) {
-        setState(() {
-          establishment = data;
+    loading = true;
+    try {
+      if (prefs.getString("officers") == null) {
+        final ioc = new HttpClient();
+        ioc.badCertificateCallback =
+            (X509Certificate cert, String host, int port) => true;
+        final http = new IOClient(ioc);
+        var res = await http
+            .get(Uri.parse(EXTENSION_OFFICERS), headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          //'Authorization': 'AppBearer ' + token,
         });
-      });
-    } else {
-      setState(() {
-        loading = true;
-      });
-      String storedData = prefs.getString("officers").toString();
-      Map<String, dynamic> map = json.decode(storedData);
-      List<dynamic> data = map["data"];
+        if (res.statusCode == 200) {
+          //var obj = json.decode(res.body);
+          Map<String, dynamic> map = json.decode(res.body);
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setString("officers", res.body);
+          List<dynamic> data = map["data"];
 
-      //filter before returning data.
-      filteredData = data
-          .where((e) => e["company"]["id"].toString() == _miller_id.toString())
-          .toList();
-      setState(() {
-        loading = false;
-      });
+          //filter before returning data.
+          filteredData = data
+              .where(
+                  (e) => e["company"]["id"].toString() == _miller_id.toString())
+              .toList();
+          loading = false;
+        }
+      } else {
+        setState(() {
+          loading = true;
+        });
+        String storedData = prefs.getString("officers").toString();
+        Map<String, dynamic> map = json.decode(storedData);
+        List<dynamic> data = map["data"];
+
+        //filter before returning data.
+        filteredData = data
+            .where(
+                (e) => e["company"]["id"].toString() == _miller_id.toString())
+            .toList();
+        setState(() {
+          loading = false;
+        });
+      }
+    } catch (e) {
+      loading = false;
     }
     return filteredData;
   }
