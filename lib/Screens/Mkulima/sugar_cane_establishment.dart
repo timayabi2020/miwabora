@@ -44,7 +44,7 @@ class _SugarcaneEstablishmentPageState
                 child: Text("Sugarcane Establishment",
                     style: TextStyle(
                         color: Colors.white,
-                        fontSize: 18,
+                        fontSize: 15,
                         fontWeight: FontWeight.bold)),
               )
             ]),

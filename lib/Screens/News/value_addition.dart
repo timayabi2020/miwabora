@@ -62,7 +62,7 @@ class _ValueAdditionPage extends State<ValueAdditionPage> {
                     maxLines: 15,
                     style: TextStyle(
                         color: Colors.white,
-                        fontSize: 18,
+                        fontSize: 15,
                         fontWeight: FontWeight.bold)),
               )
             ]),

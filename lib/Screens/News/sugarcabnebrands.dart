@@ -63,7 +63,7 @@ class _BrandsPage extends State<BrandsPage> {
                     maxLines: 15,
                     style: TextStyle(
                         color: Colors.white,
-                        fontSize: 18,
+                        fontSize: 15,
                         fontWeight: FontWeight.bold)),
               )
             ]),

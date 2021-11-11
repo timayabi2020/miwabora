@@ -41,7 +41,7 @@ class _GettingStartedPageState extends State<GettingStartedPage> {
             title: Text("Getting started",
                 style: TextStyle(
                     color: Colors.white,
-                    fontSize: 18,
+                    fontSize: 15,
                     fontWeight: FontWeight.bold)),
             backgroundColor: kPrimaryColor,
           ),

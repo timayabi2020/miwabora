@@ -26,7 +26,9 @@ class ProductionDescriptionPage extends StatelessWidget {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-        appBar: AppBar(title: Text(title.toString() + " Details")),
+        appBar: AppBar(
+            title: Text(title.toString() + " Details",
+                style: TextStyle(fontSize: 15))),
         body: SingleChildScrollView(
             child: Column(
           children: [

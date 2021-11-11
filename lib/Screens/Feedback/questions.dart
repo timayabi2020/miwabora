@@ -67,7 +67,7 @@ class _QuestionsPageState extends State<QuestionsPage> {
           resizeToAvoidBottomInset: false,
           backgroundColor: Colors.transparent,
           appBar: AppBar(
-            title: Text("Ask Question"),
+            title: Text("Ask Question", style: TextStyle(fontSize: 15)),
             backgroundColor: kPrimaryColor,
           ),
           body: SingleChildScrollView(

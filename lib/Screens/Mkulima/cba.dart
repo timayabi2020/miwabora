@@ -43,7 +43,7 @@ class _CBAPageState extends State<CBAPage> {
                     maxLines: 20,
                     style: TextStyle(
                         color: Colors.white,
-                        fontSize: 18,
+                        fontSize: 15,
                         fontWeight: FontWeight.bold)),
               )
             ]),

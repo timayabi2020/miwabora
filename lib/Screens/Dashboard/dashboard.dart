@@ -261,10 +261,10 @@ class _DashboardState extends State<Dashboard> {
               leading: new IconButton(
                   icon: Icon(Icons.home),
                   onPressed: () {
-                    //_displayDialog(context);
+                    Navigator.of(context).pop();
                   }),
               onTap: () {
-                //_displayDialog(context);
+                Navigator.of(context).pop();
               },
             ),
             ListTile(
@@ -388,8 +388,9 @@ class _DashboardState extends State<Dashboard> {
                                   children: [
                                     TextButton(
                                       child: Text(mkulimaList[position].title,
-                                          style:
-                                              TextStyle(color: kPrimaryColor)),
+                                          style: TextStyle(
+                                              color: kPrimaryColor,
+                                              fontSize: 11)),
                                       onPressed: () {
                                         openMkulimaServices(
                                             position, context, size);
@@ -436,8 +437,9 @@ class _DashboardState extends State<Dashboard> {
                                   children: [
                                     TextButton(
                                       child: Text(newsList[position].title,
-                                          style:
-                                              TextStyle(color: kPrimaryColor)),
+                                          style: TextStyle(
+                                              color: kPrimaryColor,
+                                              fontSize: 11)),
                                       onPressed: () {
                                         // openServices(
                                         openNewsServices(
@@ -486,8 +488,9 @@ class _DashboardState extends State<Dashboard> {
                                   children: [
                                     TextButton(
                                       child: Text(millerList[position].title,
-                                          style:
-                                              TextStyle(color: kPrimaryColor)),
+                                          style: TextStyle(
+                                              color: kPrimaryColor,
+                                              fontSize: 11)),
                                       onPressed: () {
                                         openMillerServices(
                                             position, context, size);
@@ -533,8 +536,9 @@ class _DashboardState extends State<Dashboard> {
                                   children: [
                                     TextButton(
                                       child: Text(feedbackList[position].title,
-                                          style:
-                                              TextStyle(color: kPrimaryColor)),
+                                          style: TextStyle(
+                                              color: kPrimaryColor,
+                                              fontSize: 11)),
                                       onPressed: () {
                                         fedbackTap(context, position);
                                       },
@@ -1268,7 +1272,10 @@ class _DashboardState extends State<Dashboard> {
         MaterialPageRoute(
           builder: (context) {
             return DIagnosisPage(
-                imgPath: diseaseFile!.path.toString(), payload: details!);
+              imgPath: diseaseFile!.path.toString(),
+              payload: details!,
+              miller_id: _miller_id,
+            );
           },
         ),
       );

@@ -42,7 +42,7 @@ class _ProductionEnvironmentPage extends State<ProductionEnvironmentPage> {
                 child: Text("Production Environment",
                     style: TextStyle(
                         color: Colors.white,
-                        fontSize: 18,
+                        fontSize: 15,
                         fontWeight: FontWeight.bold)),
               )
             ]),

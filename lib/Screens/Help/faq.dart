@@ -51,7 +51,7 @@ class _FaqState extends State<FaqState> {
             title: Text("FAQ Questions",
                 style: TextStyle(
                     color: Colors.white,
-                    fontSize: 18,
+                    fontSize: 15,
                     fontWeight: FontWeight.bold)),
             backgroundColor: kPrimaryColor,
           ),

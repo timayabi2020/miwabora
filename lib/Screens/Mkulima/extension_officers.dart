@@ -58,7 +58,7 @@ class _OfficersPageState extends State<OfficersPage> {
                       maxLines: 15,
                       style: TextStyle(
                           color: Colors.white,
-                          fontSize: 18,
+                          fontSize: 15,
                           fontWeight: FontWeight.bold)),
                 )
               ]),

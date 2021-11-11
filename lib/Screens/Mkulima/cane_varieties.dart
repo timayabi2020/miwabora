@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/io_client.dart';
 import 'package:miwabora/Config/config.dart';
 import 'package:miwabora/Network/network.dart';
+import 'package:miwabora/Screens/Mkulima/cane_description.dart';
 import 'package:miwabora/Screens/Mkulima/common_description.dart';
 import 'package:miwabora/components/rounded_button.dart';
 import 'package:miwabora/constants.dart';
@@ -62,7 +63,7 @@ class _CaneVarietyPage extends State<CaneVarietyPage> {
                     maxLines: 15,
                     style: TextStyle(
                         color: Colors.white,
-                        fontSize: 18,
+                        fontSize: 15,
                         fontWeight: FontWeight.bold)),
               )
             ]),
@@ -247,17 +248,19 @@ class _CaneVarietyPage extends State<CaneVarietyPage> {
     String description = establishment[index]["description"];
     String title = establishment[index]["name"];
     String imgUrl = establishment[index]['photo']['url'];
+    List locations = establishment[index]['tags'];
+    print(locations);
 
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) {
-          return MkulimaDescriptionPage(
-            text: description,
-            title: title,
-            url: imgUrl,
-            internetCheck: this.internetCheck,
-          );
+          return CaneDescriptionPage(
+              text: description,
+              title: title,
+              url: imgUrl,
+              internetCheck: this.internetCheck,
+              locations: locations);
         },
       ),
     );

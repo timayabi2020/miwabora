@@ -43,7 +43,7 @@ class _InnovationPageState extends State<InnovationPage> {
                     maxLines: 15,
                     style: TextStyle(
                         color: Colors.white,
-                        fontSize: 18,
+                        fontSize: 15,
                         fontWeight: FontWeight.bold)),
               )
             ]),

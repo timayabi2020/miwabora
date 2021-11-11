@@ -178,7 +178,7 @@ class _UpdateMillerRegistrationPageState
           resizeToAvoidBottomInset: false,
           backgroundColor: Colors.transparent,
           appBar: AppBar(
-            title: Text("Miller Register"),
+            title: Text("Miller Register", style: TextStyle(fontSize: 15)),
             backgroundColor: kPrimaryColor,
           ),
           body: SingleChildScrollView(

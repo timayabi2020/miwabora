@@ -100,6 +100,17 @@ class _UpdateFarmerRegistrationPageState
     String? farmsize = this.details!["size_of_farm"];
     String? zone = this.details!["zone_id"];
 
+    List<String> preloaded = subcounty.toString().split(" - ");
+
+    String ward = preloaded[1];
+    ward = ward.contains("ward")
+        ? ward.replaceAll("ward", "").trimRight()
+        : ward.trimRight();
+    /* List filteredPreload =
+        sub_counties.where((county) => county["ward"] == ward).toList();
+
+    print("Filtered Id " + filteredPreload[0]["id"].toString());*/
+
     setState(() {
       _name = username;
       _email = email;
@@ -108,7 +119,7 @@ class _UpdateFarmerRegistrationPageState
       _type = type;
       _selectedMiller = miller;
       _selectedCounty = county.toString();
-      _selectedSubCounty = subcounty;
+      _selectedSubCounty = ward;
       _size = farmsize;
       _selectedZone = zone;
     });
@@ -241,7 +252,10 @@ class _UpdateFarmerRegistrationPageState
           resizeToAvoidBottomInset: false,
           backgroundColor: Colors.transparent,
           appBar: AppBar(
-            title: Text("Profile"),
+            title: Text(
+              "Profile",
+              style: TextStyle(fontSize: 15),
+            ),
             backgroundColor: kPrimaryColor,
           ),
           body: SingleChildScrollView(
@@ -615,8 +629,9 @@ class _UpdateFarmerRegistrationPageState
                                   items: filtererd_subcounties.map(
                                     (val) {
                                       return DropdownMenuItem<String>(
-                                        value: val['ward'].toString(),
-                                        child: Text(val['ward']),
+                                        value: val['ward'],
+                                        child: Text(
+                                            val['name'] + " - " + val['ward']),
                                       );
                                     },
                                   ).toList(),
@@ -738,9 +753,11 @@ class _UpdateFarmerRegistrationPageState
         _selectedSubCounty = null;
       },
     );
+    List filteredCounty = counties.where((c) => c["name"] == val).toList();
+    String countyId = filteredCounty[0]["id"].toString();
 
     filtererd_subcounties = sub_counties
-        .where((county) => county["county_id"].toString() == val)
+        .where((county) => county["county_id"].toString() == countyId)
         .toList();
   }
 
@@ -905,6 +922,12 @@ class _UpdateFarmerRegistrationPageState
       String _selectedSubCounty,
       String _selectedZone,
       BuildContext context) async {
+    List filteredSubcountyPreload = sub_counties
+        .where((county) => county["ward"] == _selectedSubCounty)
+        .toList();
+    String subCounty = filteredSubcountyPreload[0]["name"] +
+        " - " +
+        filteredSubcountyPreload[0]["ward"];
     final ioc = new HttpClient();
     ioc.badCertificateCallback =
         (X509Certificate cert, String host, int port) => true;
@@ -927,7 +950,7 @@ class _UpdateFarmerRegistrationPageState
         "&miller_id=" +
         _selectedMiller +
         "&sub_county=" +
-        _selectedSubCounty +
+        subCounty +
         "&size_of_farm=" +
         _size +
         "&farmer_types=" +

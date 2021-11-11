@@ -114,7 +114,7 @@ class _TraderRegistrationPageState extends State<TraderRegistrationPage> {
           resizeToAvoidBottomInset: false,
           backgroundColor: Colors.transparent,
           appBar: AppBar(
-            title: Text("Trader Register"),
+            title: Text("Trader Register", style: TextStyle(fontSize: 15)),
             backgroundColor: kPrimaryColor,
           ),
           body: SingleChildScrollView(

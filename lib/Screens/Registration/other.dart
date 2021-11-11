@@ -140,7 +140,7 @@ class _OtherRegistrationPageState extends State<OtherRegistrationPage> {
           resizeToAvoidBottomInset: false,
           backgroundColor: Colors.transparent,
           appBar: AppBar(
-            title: Text("Other Register"),
+            title: Text("Other Register", style: TextStyle(fontSize: 15)),
             backgroundColor: kPrimaryColor,
           ),
           body: SingleChildScrollView(

@@ -168,7 +168,10 @@ class _UpdateOtherRegistrationPageState
           resizeToAvoidBottomInset: false,
           backgroundColor: Colors.transparent,
           appBar: AppBar(
-            title: Text("Profile"),
+            title: Text(
+              "Profile",
+              style: TextStyle(fontSize: 15),
+            ),
             backgroundColor: kPrimaryColor,
           ),
           body: SingleChildScrollView(

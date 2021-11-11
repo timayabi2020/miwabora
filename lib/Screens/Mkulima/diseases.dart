@@ -66,7 +66,7 @@ class _DiseasesPage extends State<DiseasesPage> {
                     maxLines: 15,
                     style: TextStyle(
                         color: Colors.white,
-                        fontSize: 18,
+                        fontSize: 15,
                         fontWeight: FontWeight.bold)),
               )
             ]),

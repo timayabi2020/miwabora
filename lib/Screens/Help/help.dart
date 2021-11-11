@@ -41,7 +41,7 @@ class _HelpState extends State<Help> {
             title: Text("Help",
                 style: TextStyle(
                     color: Colors.white,
-                    fontSize: 18,
+                    fontSize: 15,
                     fontWeight: FontWeight.bold)),
             backgroundColor: kPrimaryColor,
           ),

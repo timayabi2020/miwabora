@@ -44,7 +44,7 @@ class _CBATemplatePageState extends State<CBATemplatePage> {
                     maxLines: 20,
                     style: TextStyle(
                         color: Colors.white,
-                        fontSize: 18,
+                        fontSize: 15,
                         fontWeight: FontWeight.bold)),
               )
             ]),

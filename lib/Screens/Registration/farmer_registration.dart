@@ -198,7 +198,7 @@ class _FarmerRegistrationPageState extends State<FarmerRegistrationPage> {
           resizeToAvoidBottomInset: false,
           backgroundColor: Colors.transparent,
           appBar: AppBar(
-            title: Text("Farmer Register"),
+            title: Text("Farmer Register", style: TextStyle(fontSize: 15)),
             backgroundColor: kPrimaryColor,
           ),
           body: SingleChildScrollView(
@@ -573,8 +573,9 @@ class _FarmerRegistrationPageState extends State<FarmerRegistrationPage> {
                                   items: filtererd_subcounties.map(
                                     (val) {
                                       return DropdownMenuItem<String>(
-                                        value: val['ward'].toString(),
-                                        child: Text(val['ward']),
+                                        value: val['ward'],
+                                        child: Text(
+                                            val['name'] + " - " + val['ward']),
                                       );
                                     },
                                   ).toList(),
@@ -688,10 +689,12 @@ class _FarmerRegistrationPageState extends State<FarmerRegistrationPage> {
     setState(() {
       filtererd_subcounties.clear();
     });
+
+    List filteredCounty = counties.where((c) => c["name"] == val).toList();
+    String countyId = filteredCounty[0]["id"].toString();
     setState(() {
       filtererd_subcounties = sub_counties
-          .where(
-              (county) => county["county_id"].toString().toLowerCase() == val)
+          .where((county) => county["county_id"].toString() == countyId)
           .toList();
     });
   }
@@ -854,6 +857,12 @@ class _FarmerRegistrationPageState extends State<FarmerRegistrationPage> {
       String _selectedSubCounty,
       String _selectedZone,
       BuildContext context) async {
+    List filteredSubcountyPreload = sub_counties
+        .where((county) => county["ward"] == _selectedSubCounty)
+        .toList();
+    String subCounty = filteredSubcountyPreload[0]["name"] +
+        " - " +
+        filteredSubcountyPreload[0]["ward"];
     final ioc = new HttpClient();
     ioc.badCertificateCallback =
         (X509Certificate cert, String host, int port) => true;
@@ -876,7 +885,7 @@ class _FarmerRegistrationPageState extends State<FarmerRegistrationPage> {
             "&miller_id=" +
             _selectedMiller +
             "&sub_county=" +
-            _selectedSubCounty +
+            subCounty +
             "&size_of_farm=" +
             _size +
             "&farmer_types=" +

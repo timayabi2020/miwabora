@@ -87,7 +87,7 @@ class _ProfileBriefState extends State<ProfileBrief> {
                 child: Text("Profile",
                     style: TextStyle(
                         color: Colors.white,
-                        fontSize: 18,
+                        fontSize: 15,
                         fontWeight: FontWeight.bold)),
               ),
               SizedBox(width: size.width * 0.3),

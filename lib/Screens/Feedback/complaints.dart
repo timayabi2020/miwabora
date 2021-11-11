@@ -67,7 +67,7 @@ class _ComplaintsPageState extends State<ComplaintsPage> {
           resizeToAvoidBottomInset: false,
           backgroundColor: Colors.transparent,
           appBar: AppBar(
-            title: Text("Raise complaint"),
+            title: Text("Raise complaint", style: TextStyle(fontSize: 15)),
             backgroundColor: kPrimaryColor,
           ),
           body: SingleChildScrollView(
